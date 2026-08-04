@@ -4,8 +4,16 @@
 
 Built by Shanmukha Vellamcheti and OpenAI Codex.
 
-AgentRoots is an open-source Agent Continuity MCP. It lets Codex, Claude, DeepSeek, and
-generic MCP clients continue from compact, reviewed, evidence-backed state instead of replaying
+**Memory recalls the past. AgentRoots carries the project forward.**
+
+Code memory remembers where agents have been. AgentRoots preserves where the project has been,
+where it stands, and what remains to be explored. It turns disposable agent exploration into
+durable, evidence-backed project state.
+
+![AgentRoots connects past attempts, present evidence, and the future frontier through shared roots](docs/assets/agentroots-past-present-future.jpg)
+
+AgentRoots is an open-source Agent Continuity MCP. It lets Codex, Claude, DeepSeek, and generic
+MCP clients continue from compact, reviewed, evidence-backed state instead of replaying
 transcripts or repeating prior work.
 
 One agent can preserve useful state across sessions. Multiple agents can propose, review, and
