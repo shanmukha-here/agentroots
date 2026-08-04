@@ -6,10 +6,25 @@ build-backend = "hatchling.build"
 name = "agentroots"
 version = "0.1.0"
 description = "Evidence-governed continuity for AI agents"
+authors = [{name = "Shanmukha Vellamcheti"}]
 readme = "README.md"
 license = {text = "Apache-2.0"}
 requires-python = ">=3.11"
+keywords = ["ai-agents", "mcp", "provenance", "agent-memory", "research"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
 dependencies = ["mcp>=1.2,<2", "pydantic>=2.7,<3", "platformdirs>=4,<5", "rapidfuzz>=3.9,<4"]
+
+[project.urls]
+Homepage = "https://github.com/shanmukha-here/agentroots"
+Repository = "https://github.com/shanmukha-here/agentroots"
+Issues = "https://github.com/shanmukha-here/agentroots/issues"
 
 [project.optional-dependencies]
 dev = ["build>=1.2", "mypy>=1.11", "pytest>=8", "ruff>=0.6"]

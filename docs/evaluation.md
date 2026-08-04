@@ -11,3 +11,13 @@ without repeating known failed exploration.
 
 Do not advertise token/work reduction until benchmark produces reproducible measured values.
 
+Run the deterministic continuity smoke benchmark with:
+
+```bash
+python examples/continuity_benchmark.py
+```
+
+It creates 100 reviewed findings in temporary external state, starts a fresh service instance,
+queries one known failed experiment, and reports recall, estimated packet tokens, configured
+budget, and local retrieval latency. This smoke benchmark checks mechanics. It does not measure
+task-success improvement against the baselines above.
