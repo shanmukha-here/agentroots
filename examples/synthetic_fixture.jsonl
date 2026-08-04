@@ -1,0 +1,2 @@
+{"project":"cache-study","type":"hypothesis","title":"Cache lowers latency","body":"Median latency falls under repeated reads.","creator":"claude","mode":"preregistered"}
+{"project":"cache-study","type":"observation","title":"Large cache failed","body":"Memory pressure erased gain; retain failed approach.","creator":"worker","mode":"exploratory"}
