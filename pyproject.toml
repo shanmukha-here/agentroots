@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "research-state-mcp"
+name = "agentroots"
 version = "0.1.0"
-description = "Cross-harness research provenance and state protocol"
+description = "Evidence-governed continuity for AI agents"
 readme = "README.md"
 license = {text = "Apache-2.0"}
 requires-python = ">=3.11"
@@ -15,11 +15,11 @@ dependencies = ["mcp>=1.2,<2", "pydantic>=2.7,<3", "platformdirs>=4,<5", "rapidf
 dev = ["build>=1.2", "mypy>=1.11", "pytest>=8", "ruff>=0.6"]
 
 [project.scripts]
-research-state = "research_state_mcp.cli:main"
-research-state-mcp = "research_state_mcp.server:main"
+agentroots = "agentroots.cli:main"
+agentroots-mcp = "agentroots.server:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/research_state_mcp"]
+packages = ["src/agentroots"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -31,4 +31,4 @@ target-version = "py311"
 [tool.mypy]
 python_version = "3.11"
 strict = true
-packages = ["research_state_mcp"]
+packages = ["agentroots"]

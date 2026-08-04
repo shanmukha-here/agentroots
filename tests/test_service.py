@@ -2,9 +2,9 @@ from pathlib import Path
 
 import pytest
 
-from research_state_mcp.db import Database
-from research_state_mcp.models import EvidenceLink
-from research_state_mcp.service import ConflictError, GovernanceError, ResearchService
+from agentroots.db import Database
+from agentroots.models import EvidenceLink
+from agentroots.service import ConflictError, GovernanceError, ResearchService
 
 
 @pytest.fixture

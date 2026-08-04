@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from research_state_mcp.db import Database
-from research_state_mcp.importers import import_hef, import_signac_jobs
-from research_state_mcp.service import ResearchService
+from agentroots.db import Database
+from agentroots.importers import import_hef, import_signac_jobs
+from agentroots.service import ResearchService
 
 
 def test_compact_importers_are_idempotent(tmp_path: Path) -> None:

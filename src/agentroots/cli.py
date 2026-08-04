@@ -12,7 +12,7 @@ from .service import ResearchService
 
 
 def parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="research-state")
+    p = argparse.ArgumentParser(prog="agentroots")
     p.add_argument("--db", type=Path, default=db_path())
     sub = p.add_subparsers(dest="command", required=True)
     q = sub.add_parser("propose")

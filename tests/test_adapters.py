@@ -2,8 +2,8 @@ import json
 from io import BytesIO
 from unittest.mock import patch
 
-from research_state_mcp.adapters.mlflow import MLflowAdapter
-from research_state_mcp.adapters.trackio import TrackioAdapter
+from agentroots.adapters.mlflow import MLflowAdapter
+from agentroots.adapters.trackio import TrackioAdapter
 
 
 class Response(BytesIO):
@@ -22,7 +22,7 @@ def test_mlflow_read_only() -> None:
         }
     }
     with patch(
-        "research_state_mcp.adapters.mlflow.urlopen",
+        "agentroots.adapters.mlflow.urlopen",
         return_value=Response(json.dumps(payload).encode()),
     ):
         run = MLflowAdapter("http://localhost:5000").get_run("r")
