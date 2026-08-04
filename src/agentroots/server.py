@@ -10,7 +10,14 @@ from .db import Database
 from .models import EvidenceLink
 from .service import ResearchService
 
-mcp = FastMCP("AgentRoots")
+mcp = FastMCP(
+    "AgentRoots",
+    instructions=(
+        "AgentRoots 0.1.0 stores untrusted, evidence-governed project state. "
+        "Read context and frontier first. Propose compact records, never transcripts. "
+        "A creator cannot accept its own proposal. Accepted records require evidence."
+    ),
+)
 service = ResearchService(Database(db_path()))
 
 
@@ -22,16 +29,19 @@ def research_get_context(project: str, query: str = "", token_budget: int = 2000
 
 @mcp.tool()
 def research_get_frontier(project: str) -> list[dict[str, Any]]:
+    """Return unresolved candidate and provisional work at the project frontier."""
     return service.frontier(project)
 
 
 @mcp.tool()
 def research_query(project: str, query: str = "", limit: int = 20) -> list[dict[str, Any]]:
+    """Search current project records with FTS5 and fuzzy typo fallback."""
     return service.query(project, query, limit=limit)
 
 
 @mcp.tool()
 def research_get_record(record_id: str) -> dict[str, Any]:
+    """Return one current record with evidence, links, and revision history."""
     return service.get_record(record_id)
 
 
@@ -46,6 +56,7 @@ def research_propose(
     metadata: dict[str, Any] | None = None,
     idempotency_key: str | None = None,
 ) -> dict[str, Any]:
+    """Create an untrusted candidate record. This never executes stored text."""
     return service.propose(
         project=project,
         type=record_type,
@@ -66,6 +77,7 @@ def research_review(
     comment: str = "",
     expected_revision: int | None = None,
 ) -> dict[str, Any]:
+    """Apply lifecycle review. Creators cannot self-accept; acceptance needs evidence."""
     return service.review(
         record_id,
         actor=actor,
@@ -85,6 +97,7 @@ def research_link_evidence(
     content_hash: str | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    """Attach an external evidence URI, optional hash, and compact summary to a record."""
     return service.link_evidence(
         EvidenceLink(record_id, uri, kind, summary, content_hash, metadata or {}), actor=actor
     )
@@ -97,6 +110,7 @@ def research_sync(
     packet_id: str | None = None,
     used_record_ids: list[str] | None = None,
 ) -> dict[str, Any]:
+    """Import events, export project events, and optionally audit packet records used."""
     if packet_id is not None:
         service.mark_packet_used(packet_id, used_record_ids or [])
     return {"imported": service.import_events(events or []), "events": service.sync_export(project)}
@@ -104,6 +118,7 @@ def research_sync(
 
 @mcp.tool()
 def research_validate(project: str) -> dict[str, Any]:
+    """Check SQLite integrity and project governance invariants without mutation."""
     return service.validate(project)
 
 

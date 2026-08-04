@@ -22,10 +22,13 @@ Branches explore. Roots remember.
 ## Quick start
 
 ```bash
-python -m pip install -e .
+python -m pip install "agentroots @ git+https://github.com/shanmukha-here/agentroots.git"
 agentroots propose demo hypothesis "Caching helps" "Latency should fall." --actor codex
 agentroots-mcp
 ```
+
+AgentRoots is not published to PyPI yet. Contributors cloning the repository can instead use
+`python -m pip install -e .`. Python 3.11 or newer is required.
 
 State defaults to the OS or XDG user data directory. Override it with `AGENTROOTS_DB` or
 `--db`. The legacy `RESEARCH_STATE_DB` variable remains accepted for local migration. SQLite
@@ -41,6 +44,33 @@ Resources: project brief, project frontier, record, and context packet under the
 `research://` URI scheme. Protocol names remain research-specific because the initial ontology
 models evidence-backed investigative work. AgentRoots branding covers its broader engineering,
 research, and long-running agent uses.
+
+Exact resource templates:
+
+- `research://project/{project}/brief`
+- `research://project/{project}/frontier`
+- `research://record/{record_id}`
+- `research://packet/{packet_id}`
+
+Example MCP argument shapes:
+
+```json
+{"tool":"research_propose","arguments":{"project":"demo","record_type":"finding","title":"Cache result","body":"Reads improved 12 percent.","creator":"codex"}}
+{"tool":"research_review","arguments":{"record_id":"UUID","actor":"reviewer","verdict":"provisional"}}
+{"tool":"research_link_evidence","arguments":{"record_id":"UUID","uri":"mlflow://runs/123","kind":"mlflow-run","actor":"reviewer","content_hash":"sha256-if-known"}}
+{"tool":"research_get_context","arguments":{"project":"demo","query":"cache","token_budget":1500}}
+```
+
+`research_sync` imports supplied events, exports current project events, and can mark packet
+record IDs as used. CLI `export` and `import` provide file-based JSONL transfer.
+
+CLI query text is positional. Run `agentroots <command> --help` for command-specific arguments:
+
+```bash
+agentroots context demo "cache latency" --tokens 1500
+agentroots validate demo
+agentroots export demo events.jsonl
+```
 
 Lifecycle: candidate to provisional to accepted, plus disputed, rejected, superseded, and stale.
 Creators cannot accept their own proposals by default. Acceptance requires resolvable evidence.
