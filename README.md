@@ -2,6 +2,8 @@
 
 **Different agents. Same roots.**
 
+Built by Shanmukha Vellamcheti and OpenAI Codex.
+
 AgentRoots is an open-source Agent Continuity MCP. It lets Codex, Claude, DeepSeek, and
 generic MCP clients continue from compact, reviewed, evidence-backed state instead of replaying
 transcripts or repeating prior work.
