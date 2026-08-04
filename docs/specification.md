@@ -10,6 +10,9 @@ imports conservatively materialize unseen proposal events.
 
 Candidate can become provisional or rejected. Provisional can become accepted, disputed, or
 rejected. Accepted can become disputed, superseded, or stale. Creator cannot accept own proposal.
+An accepted record may explicitly `resolves` one or more same-project goals. Resolved goals stay
+in history but leave the frontier and current-goal packet sections. `supports` never implies
+completion.
 
 Packets rank accepted then provisional then remaining records, apply FTS5 with typo fallback,
 expand graph neighbors, exclude stale/superseded facts, expose required semantic sections, and fit

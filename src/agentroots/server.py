@@ -76,14 +76,16 @@ def research_review(
     verdict: str,
     comment: str = "",
     expected_revision: int | None = None,
+    resolves_record_ids: list[str] | None = None,
 ) -> dict[str, Any]:
-    """Apply lifecycle review. Creators cannot self-accept; acceptance needs evidence."""
+    """Review a record and optionally resolve goals when accepting evidence-backed work."""
     return service.review(
         record_id,
         actor=actor,
         verdict=verdict,
         comment=comment,
         expected_revision=expected_revision,
+        resolves_record_ids=resolves_record_ids or [],
     )
 
 

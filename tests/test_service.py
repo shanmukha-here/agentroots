@@ -30,6 +30,55 @@ def test_review_governance_and_context(service: ResearchService) -> None:
     assert packet["estimated_tokens"] <= 500
 
 
+def test_accepted_finding_explicitly_resolves_goal_and_clears_frontier(
+    service: ResearchService, tmp_path: Path,
+) -> None:
+    goal = service.propose(project="p", type="goal", title="Ship fix", body="Do it", creator="a")
+    finding = service.propose(
+        project="p", type="finding", title="Fix shipped", body="Tests pass", creator="worker"
+    )
+    service.review(finding["id"], actor="reviewer", verdict="provisional")
+    service.link_evidence(
+        EvidenceLink(finding["id"], "test://pytest/resolved", "test", "passed"),
+        actor="reviewer",
+    )
+    accepted = service.review(
+        finding["id"],
+        actor="reviewer",
+        verdict="accepted",
+        resolves_record_ids=[goal["id"]],
+    )
+    assert any(link["relation"] == "resolves" for link in accepted["links"])
+    assert goal["id"] not in {record["id"] for record in service.frontier("p")}
+    packet = service.context("p")
+    assert packet["sections"]["current_goal"] == []
+    assert goal["id"] not in {
+        record["id"] for record in packet["sections"]["suggested_frontier"]
+    }
+    restored = ResearchService(Database(tmp_path / "restored.db"))
+    restored.import_events(service.sync_export("p"))
+    assert goal["id"] not in {record["id"] for record in restored.frontier("p")}
+
+    service.review(finding["id"], actor="reviewer-2", verdict="disputed")
+    assert goal["id"] in {record["id"] for record in service.frontier("p")}
+
+
+def test_resolving_requires_acceptance_and_same_project_goal(service: ResearchService) -> None:
+    goal = service.propose(project="p", type="goal", title="g", body="b", creator="a")
+    other = service.propose(project="q", type="goal", title="other", body="b", creator="a")
+    finding = service.propose(project="p", type="finding", title="f", body="b", creator="worker")
+    with pytest.raises(GovernanceError, match="accepted review"):
+        service.review(
+            finding["id"], actor="reviewer", verdict="provisional", resolves_record_ids=[goal["id"]]
+        )
+    service.review(finding["id"], actor="reviewer", verdict="provisional")
+    service.link_evidence(EvidenceLink(finding["id"], "test://pytest/x", "test"), actor="reviewer")
+    with pytest.raises(GovernanceError, match="same project"):
+        service.review(
+            finding["id"], actor="reviewer", verdict="accepted", resolves_record_ids=[other["id"]]
+        )
+
+
 def test_redaction_evidence_and_validation(service: ResearchService) -> None:
     record = service.propose(
         project="p", type="observation", title="x", body="api_key=supersecretvalue", creator="a"

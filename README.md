@@ -56,7 +56,7 @@ Example MCP argument shapes:
 
 ```json
 {"tool":"research_propose","arguments":{"project":"demo","record_type":"finding","title":"Cache result","body":"Reads improved 12 percent.","creator":"codex"}}
-{"tool":"research_review","arguments":{"record_id":"UUID","actor":"reviewer","verdict":"provisional"}}
+{"tool":"research_review","arguments":{"record_id":"UUID","actor":"reviewer","verdict":"accepted","resolves_record_ids":["GOAL_UUID"]}}
 {"tool":"research_link_evidence","arguments":{"record_id":"UUID","uri":"mlflow://runs/123","kind":"mlflow-run","actor":"reviewer","content_hash":"sha256-if-known"}}
 {"tool":"research_get_context","arguments":{"project":"demo","query":"cache","token_budget":1500}}
 ```
@@ -72,9 +72,20 @@ agentroots validate demo
 agentroots export demo events.jsonl
 ```
 
+On Windows, prefer these positional CLI commands or MCP tool calls over hand-escaped JSON in
+PowerShell. For contributor tests in a clean checkout:
+
+```bash
+python -m pip install -e ".[dev]"
+python -m pytest
+```
+
 Lifecycle: candidate to provisional to accepted, plus disputed, rejected, superseded, and stale.
 Creators cannot accept their own proposals by default. Acceptance requires resolvable evidence.
 Mutations emit append-only events. Stored text is always treated as untrusted data.
+An accepted finding can explicitly resolve one or more goals. A `resolves` link removes those
+goals from the active frontier while preserving their full history. `supports` does not close a
+goal.
 
 Implemented today:
 

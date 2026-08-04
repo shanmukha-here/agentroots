@@ -36,6 +36,7 @@ RELATIONS = {
     "invalidates",
     "selected",
     "rejected",
+    "resolves",
 }
 
 
@@ -159,8 +160,10 @@ class ResearchService:
         verdict: str,
         comment: str = "",
         expected_revision: int | None = None,
+        resolves_record_ids: Iterable[str] = (),
     ) -> dict[str, Any]:
         target = Status(verdict)
+        resolves = list(dict.fromkeys(resolves_record_ids))
         with self.db.connect() as conn:
             row = conn.execute("SELECT * FROM records WHERE id=?", (record_id,)).fetchone()
             if not row:
@@ -186,6 +189,14 @@ class ResearchService:
                 raise GovernanceError("accepted decision requires alternatives and rationale")
             if target not in VALID_TRANSITIONS[current]:
                 raise GovernanceError(f"invalid transition: {current} -> {target}")
+            if resolves and target != Status.ACCEPTED:
+                raise GovernanceError("only an accepted review can resolve goals")
+            for target_id in resolves:
+                goal = conn.execute(
+                    "SELECT project,type FROM records WHERE id=?", (target_id,)
+                ).fetchone()
+                if not goal or goal["project"] != record["project"] or goal["type"] != "goal":
+                    raise GovernanceError("resolved record must be a goal in the same project")
             now = datetime.now(UTC).isoformat()
             revision = record["revision"] + 1
             conn.execute(
@@ -198,6 +209,18 @@ class ResearchService:
             )
             record.update(status=target, revision=revision, updated_at=now)
             self._event(conn, record, "reviewed", actor, {"verdict": target, "comment": comment})
+            for target_id in resolves:
+                conn.execute(
+                    "INSERT OR IGNORE INTO links VALUES(?,?,?,?)",
+                    (record_id, target_id, "resolves", "{}"),
+                )
+                self._event(
+                    conn,
+                    record,
+                    "linked",
+                    actor,
+                    {"target_id": target_id, "relation": "resolves"},
+                )
         return self.get_record(record_id)
 
     def link_evidence(self, link: EvidenceLink, *, actor: str) -> dict[str, Any]:
@@ -293,9 +316,19 @@ class ResearchService:
             return [self.db.decode(r) for r in rows]
 
     def frontier(self, project: str) -> list[dict[str, Any]]:
-        return self.query(
+        records = self.query(
             project, statuses=("candidate", "provisional", "disputed", "stale"), limit=100
         )
+        with self.db.connect() as conn:
+            resolved_goals = {
+                row[0]
+                for row in conn.execute(
+                    "SELECT l.target_id FROM links l JOIN records r ON r.id=l.source_id "
+                    "WHERE r.project=? AND r.status='accepted' AND l.relation='resolves'",
+                    (project,),
+                )
+            }
+        return [r for r in records if r["id"] not in resolved_goals]
 
     def context(self, project: str, query: str = "", token_budget: int = 2000) -> dict[str, Any]:
         records = self.query(project, query, limit=100) if query else self.query(project, limit=100)
@@ -340,6 +373,15 @@ class ResearchService:
                 continue
             picked.append(item)
             used += size
+        with self.db.connect() as conn:
+            resolved_goals = {
+                row[0]
+                for row in conn.execute(
+                    "SELECT l.target_id FROM links l JOIN records r ON r.id=l.source_id "
+                    "WHERE r.project=? AND r.status='accepted' AND l.relation='resolves'",
+                    (project,),
+                )
+            }
         sections: dict[str, list[dict[str, Any]]] = {
             "current_goal": [],
             "active_questions_hypotheses": [],
@@ -351,7 +393,7 @@ class ResearchService:
             "external_pointers": [],
         }
         for item in picked:
-            if item["type"] == "goal":
+            if item["type"] == "goal" and item["id"] not in resolved_goals:
                 sections["current_goal"].append(item)
             if (
                 item["type"] in {"question", "hypothesis", "experiment"}
@@ -368,7 +410,10 @@ class ResearchService:
                 link["relation"] in {"contradicts", "invalidates"} for link in item["relations"]
             ):
                 sections["contradictions_caveats"].append(item)
-            if item["status"] in {"candidate", "provisional"}:
+            if (
+                item["status"] in {"candidate", "provisional"}
+                and item["id"] not in resolved_goals
+            ):
                 sections["suggested_frontier"].append(item)
             if item["type"] in {"run_ref", "artifact_ref", "evidence"}:
                 sections["external_pointers"].append(item)
