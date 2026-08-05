@@ -4,6 +4,29 @@
 
 Built by Shanmukha Vellamcheti and OpenAI Codex.
 
+## Why I built AgentRoots
+
+My research requires exploring many hypotheses and experimental paths. Before coding agents, the
+number of experiments I could run manually was naturally limited. Agents changed that. They made
+hypothesis exploration and project-state growth dramatically faster, but they also created a new
+memory-management problem.
+
+Modern agentic work increasingly depends on orchestrators and subagents for speed and cost
+efficiency. That can multiply duplicated work. If an orchestrator assigns two independent tasks in
+the same codebase, both subagents may reread the same files to understand the project, after the
+orchestrator already read them to make the plan. The same knowledge may be reconstructed three
+times. Across longer projects, context gets mixed, facts blur, failed paths are repeated, and the
+latest working frontier becomes difficult to recover.
+
+Existing code-memory tools help agents remember the past. AgentRoots goes further by preserving
+the present and future too: what is currently accepted, what evidence supports it, what is stale or
+disputed, which goals remain active, and what questions or experiments should happen next. This
+lets agents across models and harnesses inherit a compact, grounded project state, then verify only
+what their task requires instead of rebuilding the entire context from scratch.
+
+I built AgentRoots because I needed agents to share more than memories. I needed them to inhabit
+the same evolving state, avoid duplicated exploration, and continue from the real frontier.
+
 **Memory recalls the past. AgentRoots carries the project forward.**
 
 Code memory remembers where agents have been. AgentRoots preserves where the project has been,
