@@ -8,15 +8,21 @@ from agentroots.service import ResearchService
 
 def test_graph_projection_and_self_contained_html(tmp_path: Path) -> None:
     service = ResearchService(Database(tmp_path / "state.db"))
+    origin = service.propose(
+        project="p", type="origin", title="Why this exists", body="Shared context", creator="a"
+    )
     goal = service.propose(project="p", type="goal", title="Ship map", body="Visible", creator="a")
     finding = service.propose(
         project="p", type="finding", title="Graph works", body="Navigable", creator="b"
     )
+    service.link(origin["id"], goal["id"], "decomposes", actor="a")
     service.link(goal["id"], finding["id"], "depends_on", actor="a")
     graph = service.graph("p")
-    assert graph["graph_version"] == 3
-    assert {node["id"] for node in graph["nodes"]} == {goal["id"], finding["id"]}
-    assert graph["edges"][0]["relation"] == "depends_on"
+    assert graph["graph_version"] == 5
+    assert {node["id"] for node in graph["nodes"]} == {
+        origin["id"], goal["id"], finding["id"],
+    }
+    assert {edge["relation"] for edge in graph["edges"]} == {"decomposes", "depends_on"}
 
     output = write_graph_html(graph, tmp_path / "map.html")
     document = output.read_text(encoding="utf-8")

@@ -662,6 +662,7 @@ class ResearchService:
                 )
             }
         sections: dict[str, list[dict[str, Any]]] = {
+            "project_origin": [],
             "current_goal": [],
             "active_questions_hypotheses": [],
             "accepted_findings": [],
@@ -672,6 +673,8 @@ class ResearchService:
             "external_pointers": [],
         }
         for item in picked:
+            if item["type"] == "origin" and item["status"] in {"provisional", "accepted"}:
+                sections["project_origin"].append(item)
             if item["type"] == "goal" and item["id"] not in resolved_goals:
                 sections["current_goal"].append(item)
             if (
@@ -872,7 +875,7 @@ class ResearchService:
                     issues.append({"record_id": r["id"], "code": "accepted_without_evidence"})
                 metadata = json.loads(r["metadata"])
                 substantive = r["type"] in {
-                    "goal", "question", "hypothesis", "experiment", "observation",
+                    "origin", "goal", "question", "hypothesis", "experiment", "observation",
                     "claim", "finding", "decision",
                 }
                 sentence_count = sum(r["body"].count(mark) for mark in ".!?")

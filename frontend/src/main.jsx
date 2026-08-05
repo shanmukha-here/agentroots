@@ -17,6 +17,7 @@ import "./type-shading.css";
 import dagre from "@dagrejs/dagre";
 
 const TYPE_META = {
+  origin: ["Origin", "⌂"],
   goal: ["Goal", "◎"], question: ["Question", "?"], hypothesis: ["Hypothesis", "◇"],
   experiment: ["Experiment", "⚗"], run_ref: ["Run", "▶"], observation: ["Observation", "◉"],
   claim: ["Claim", "◆"], finding: ["Finding", "✦"], decision: ["Decision", "✓"],
@@ -53,6 +54,17 @@ function layoutGraph(records, links, direction) {
       data: record,
     };
   });
+  const origins = nodes.filter(node => node.data.type === "origin");
+  const remaining = nodes.filter(node => node.data.type !== "origin");
+  if (origins.length && remaining.length) {
+    if (direction === "LR") {
+      const leadingX = Math.min(...remaining.map(node => node.position.x)) - NODE_WIDTH - 110;
+      origins.forEach(node => { node.position.x = leadingX; });
+    } else {
+      const leadingY = Math.min(...remaining.map(node => node.position.y)) - NODE_HEIGHT - 110;
+      origins.forEach(node => { node.position.y = leadingY; });
+    }
+  }
   const edges = links.map((link, index) => ({
     id: `${link.source_id}:${link.relation}:${link.target_id}:${index}`,
     source: link.source_id,

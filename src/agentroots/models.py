@@ -8,6 +8,7 @@ from uuid import uuid4
 
 
 class RecordType(StrEnum):
+    ORIGIN = "origin"
     GOAL = "goal"
     QUESTION = "question"
     HYPOTHESIS = "hypothesis"

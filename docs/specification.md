@@ -1,8 +1,11 @@
 # Protocol specification v0.1
 
-Mutable graph nodes: Goal, Question, Hypothesis, Experiment, RunRef, Observation, Claim,
+Mutable graph nodes: Origin, Goal, Question, Hypothesis, Experiment, RunRef, Observation, Claim,
 Finding, Decision, ArtifactRef, Evidence, Agent, Session. Each projection has UUID, project, creator, mode,
 status, revision, timestamps, text, and metadata. Edges use open relation names.
+
+Origin captures why a project exists, the problem that created it, who it serves, and its broad
+definition of success. It precedes concrete goals and remains durable as those goals evolve.
 
 Events append only and support idempotency keys. Revisions protect projection writes.
 JSON Schemas in `schemas/` define exchange payloads. JSONL sync orders events by ledger seq;

@@ -20,7 +20,7 @@ latest working frontier becomes difficult to recover.
 
 Memory tools preserve experience. Planning tools preserve intent. Provenance tools preserve what
 ran and changed. AgentRoots connects those concerns as evidence-governed project state: what is
-currently accepted, what evidence supports it, what is stale or disputed, which goals remain
+the project's origin, what is currently accepted, what evidence supports it, what is stale or disputed, which goals remain
 active, and what questions or experiments should happen next. This lets agents across models and
 harnesses inherit a compact, grounded frontier, then verify only what their task requires instead
 of rebuilding the entire context from scratch.

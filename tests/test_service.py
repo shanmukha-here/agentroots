@@ -30,6 +30,27 @@ def test_review_governance_and_context(service: ResearchService) -> None:
     assert packet["estimated_tokens"] <= 500
 
 
+def test_context_includes_reviewed_project_origin(service: ResearchService) -> None:
+    origin = service.propose(
+        project="p",
+        type="origin",
+        title="Why this project exists",
+        body=(
+            "The project addresses duplicated agent work. It gives agents durable shared context. "
+            "People can inspect and correct that context. Success means faster grounded continuation."
+        ),
+        creator="author",
+    )
+    service.review(origin["id"], actor="reviewer", verdict="provisional")
+    service.link_evidence(
+        EvidenceLink(origin["id"], "file://project-brief", "file", "Project brief"),
+        actor="reviewer",
+    )
+    service.review(origin["id"], actor="reviewer", verdict="accepted")
+    packet = service.context("p", query="duplicated agent work", token_budget=500)
+    assert packet["sections"]["project_origin"][0]["id"] == origin["id"]
+
+
 def test_revision_is_append_only_concurrent_and_reopens_accepted_record(
     service: ResearchService, tmp_path: Path,
 ) -> None:
