@@ -1,16 +1,33 @@
 # Landscape and positioning
 
-Current search found strong adjacent systems, not an exact substitute for governed scientific
-state shared across MCP harnesses:
+The August 2026 landscape audit found several close systems. AgentRoots is not the first durable
+cross-agent memory or the first project-state graph.
 
-- agentic-experiments: experiment grammar and execution integrations
-- Lore/Remnic: governed generic memory and provenance
-- Flowcept/AiiDA: execution/scientific provenance
-- MLflow/Trackio: run tracking and artifact metadata
+- [ProjectMem](https://github.com/riponcm/projectmem) combines typed development events, stale
+  decisions, failed-attempt warnings, compact briefings, code structure, and editable future intent.
+- [Knomit](https://github.com/knomit/knomit) provides reviewed, typed, provenanced facts with
+  confidence, hypotheses, consensus, update, and retraction.
+- [10x](https://github.com/z3z1ma/10x) defines a Markdown discipline for decisions, research,
+  tickets, evidence, review, and unresolved follow-up work.
+- [Atomic](https://github.com/atomicdotdev/atomic) combines goals, intents, memory, source changes,
+  agent attribution, review, and code intelligence inside an alternative version-control system.
+- [OpenArx](https://openarx.ai/) provides a scientific claims graph, provenance, support/dispute
+  relations, and forward-looking research cycles over a shared corpus.
+- CodeMem, ContextNest, agent-knowledge, Lore, and Remnic cover other important memory, context
+  governance, current-truth, and provenance slices.
+- Flowcept and AiiDA capture execution and scientific provenance. MLflow and Trackio track runs,
+  metrics, and artifacts.
 
-AgentRoots composes through references and adapters. It owns missing epistemic layer: why an
-experiment ran, what claim it supports, review status, contradiction, and compact frontier packet.
-Position as **research provenance and state protocol for coding agents**, not “agent memory.”
+AgentRoots targets the intersection as a small, repository-clean, cross-harness protocol. Its
+specific combination is an active Goal, Question, Hypothesis, Experiment, Finding, Decision, and
+Evidence graph; independent review; evidence-required acceptance; contradictions and staleness;
+goal resolution and reopening; compact frontier packets; and external run references without
+owning orchestration, source control, execution, or artifact storage.
 
-Search is evidence, not proof of uniqueness. Repeat landscape audit before public launch and invite
-interop discussion rather than claiming invention of adjacent concepts.
+Position as **the evidence-governed frontier shared by every agent working on a project**, not as a
+generic memory system. Memory preserves experience, planning preserves intent, and provenance
+preserves execution. AgentRoots connects them into current project state and unresolved frontier.
+
+Search is evidence, not proof of uniqueness. Repeat the audit before public launch, measure the
+claimed reduction in repeated inspection, and pursue interoperability instead of claiming adjacent
+concepts as inventions.

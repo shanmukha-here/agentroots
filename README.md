@@ -18,20 +18,20 @@ orchestrator already read them to make the plan. The same knowledge may be recon
 times. Across longer projects, context gets mixed, facts blur, failed paths are repeated, and the
 latest working frontier becomes difficult to recover.
 
-Existing code-memory tools help agents remember the past. AgentRoots goes further by preserving
-the present and future too: what is currently accepted, what evidence supports it, what is stale or
-disputed, which goals remain active, and what questions or experiments should happen next. This
-lets agents across models and harnesses inherit a compact, grounded project state, then verify only
-what their task requires instead of rebuilding the entire context from scratch.
+Memory tools preserve experience. Planning tools preserve intent. Provenance tools preserve what
+ran and changed. AgentRoots connects those concerns as evidence-governed project state: what is
+currently accepted, what evidence supports it, what is stale or disputed, which goals remain
+active, and what questions or experiments should happen next. This lets agents across models and
+harnesses inherit a compact, grounded frontier, then verify only what their task requires instead
+of rebuilding the entire context from scratch.
 
 I built AgentRoots because I needed agents to share more than memories. I needed them to inhabit
 the same evolving state, avoid duplicated exploration, and continue from the real frontier.
 
-**Memory recalls the past. AgentRoots carries the project forward.**
+**Memory preserves experience. AgentRoots governs the frontier.**
 
-Code memory remembers where agents have been. AgentRoots preserves where the project has been,
-where it stands, and what remains to be explored. It turns disposable agent exploration into
-durable, evidence-backed project state.
+AgentRoots connects where the project has been, where it stands, and what remains to be explored.
+It turns disposable agent exploration into durable, reviewed, evidence-backed project state.
 
 ![AgentRoots connects past attempts, present evidence, and the future frontier through shared roots](docs/assets/agentroots-past-present-future.jpg)
 
