@@ -26,6 +26,15 @@ happen next, without replaying transcripts or duplicating large artifacts.
 One agent can preserve useful state across sessions. Multiple agents can propose, review, and
 reuse the same findings. AgentRoots does not spawn, schedule, route, or execute agents.
 
+## See the handoff
+
+![AgentRoots preserves grounded project state so a fresh agent can continue without replaying the transcript](docs/assets/agentroots-readme-demo.webp)
+
+This animation is rendered from a real AgentRoots event ledger, context packet, and interactive
+graph projection. The workflow is synthetic and reproducible with
+`python tools/render_readme_demo.py`. A non-looping [MP4 version](docs/assets/agentroots-readme-demo.mp4)
+is also available.
+
 ## Why I built AgentRoots
 
 My research requires exploring many hypotheses and experimental paths. Before coding agents, the
