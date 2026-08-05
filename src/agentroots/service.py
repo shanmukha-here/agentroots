@@ -153,6 +153,84 @@ class ResearchService:
             ]
             return record
 
+    def revise(
+        self,
+        record_id: str,
+        *,
+        actor: str,
+        title: str | None = None,
+        body: str | None = None,
+        metadata: dict[str, Any] | None = None,
+        expected_revision: int | None = None,
+        idempotency_key: str | None = None,
+    ) -> dict[str, Any]:
+        """Append a content revision and return accepted knowledge to provisional review."""
+        with self.db.connect() as conn:
+            if idempotency_key:
+                previous = conn.execute(
+                    "SELECT record_id FROM events WHERE idempotency_key=?", (idempotency_key,)
+                ).fetchone()
+                if previous:
+                    return self.get_record(previous[0])
+            row = conn.execute("SELECT * FROM records WHERE id=?", (record_id,)).fetchone()
+            if not row:
+                raise KeyError(record_id)
+            record = self.db.decode(row)
+            if expected_revision is not None and record["revision"] != expected_revision:
+                raise ConflictError("revision conflict")
+            title_scan = scan_text(title if title is not None else record["title"])
+            body_scan = scan_text(body if body is not None else record["body"])
+            revised_metadata = dict(record["metadata"])
+            if metadata is not None:
+                revised_metadata.update(metadata)
+            if title_scan.redacted or body_scan.redacted:
+                revised_metadata["secrets_redacted"] = True
+            if title_scan.injection_risk or body_scan.injection_risk:
+                revised_metadata["prompt_injection_risk"] = True
+            revised_status = (
+                Status.PROVISIONAL.value
+                if record["status"] == Status.ACCEPTED.value
+                else record["status"]
+            )
+            revision = record["revision"] + 1
+            updated_at = datetime.now(UTC).isoformat()
+            conn.execute(
+                "UPDATE records SET title=?,body=?,status=?,revision=?,metadata=?,updated_at=? "
+                "WHERE id=?",
+                (
+                    title_scan.text,
+                    body_scan.text,
+                    revised_status,
+                    revision,
+                    json.dumps(revised_metadata),
+                    updated_at,
+                    record_id,
+                ),
+            )
+            revised = {
+                **record,
+                "title": title_scan.text,
+                "body": body_scan.text,
+                "status": revised_status,
+                "revision": revision,
+                "metadata": revised_metadata,
+                "updated_at": updated_at,
+            }
+            self._event(
+                conn,
+                revised,
+                "revised",
+                actor,
+                {
+                    "title": revised["title"],
+                    "body": revised["body"],
+                    "status": revised["status"],
+                    "metadata": revised["metadata"],
+                },
+                idempotency_key,
+            )
+        return self.get_record(record_id)
+
     def graph(self, project: str) -> dict[str, Any]:
         """Return the current project graph as a read-only projection."""
         with self.db.connect() as conn:
@@ -723,6 +801,20 @@ class ResearchService:
                             event["at"],
                         ),
                     )
+                elif kind == "revised":
+                    conn.execute(
+                        "UPDATE records SET title=?,body=?,status=?,revision=?,metadata=?,updated_at=? "
+                        "WHERE id=?",
+                        (
+                            payload["title"],
+                            payload["body"],
+                            payload["status"],
+                            event["revision"],
+                            json.dumps(payload.get("metadata", {})),
+                            event["at"],
+                            event["record_id"],
+                        ),
+                    )
                 elif kind == "evidence_linked":
                     conn.execute(
                         "INSERT OR REPLACE INTO evidence(record_id,uri,kind,summary,content_hash,metadata) VALUES(?,?,?,?,?,?)",
@@ -759,8 +851,11 @@ class ResearchService:
 
     def validate(self, project: str) -> dict[str, Any]:
         issues = []
+        warnings = []
         with self.db.connect() as conn:
-            for r in conn.execute("SELECT id,status FROM records WHERE project=?", (project,)):
+            for r in conn.execute(
+                "SELECT id,type,status,body,metadata FROM records WHERE project=?", (project,)
+            ):
                 if (
                     r["status"] == "accepted"
                     and not conn.execute(
@@ -775,8 +870,32 @@ class ResearchService:
                     ).fetchone()
                 ):
                     issues.append({"record_id": r["id"], "code": "accepted_without_evidence"})
+                metadata = json.loads(r["metadata"])
+                substantive = r["type"] in {
+                    "goal", "question", "hypothesis", "experiment", "observation",
+                    "claim", "finding", "decision",
+                }
+                sentence_count = sum(r["body"].count(mark) for mark in ".!?")
+                if (
+                    substantive
+                    and r["status"] in {"provisional", "accepted"}
+                    and not metadata.get("concise_fact")
+                    and (sentence_count < 3 or len(r["body"]) < 180)
+                ):
+                    warnings.append(
+                        {
+                            "record_id": r["id"],
+                            "code": "thin_description",
+                            "sentence_count": sentence_count,
+                        }
+                    )
             integrity = conn.execute("PRAGMA integrity_check").fetchone()[0]
-        return {"ok": not issues and integrity == "ok", "integrity": integrity, "issues": issues}
+        return {
+            "ok": not issues and integrity == "ok",
+            "integrity": integrity,
+            "issues": issues,
+            "warnings": warnings,
+        }
 
     def check_git_staleness(self, project: str, root: Path) -> list[str]:
         stale = []

@@ -68,7 +68,7 @@ runs in WAL mode. Generated state stays outside the repository.
 ## MCP surface
 
 Tools: `research_get_context`, `research_get_frontier`, `research_query`,
-`research_get_record`, `research_get_graph`, `research_propose`, `research_review`,
+`research_get_record`, `research_get_graph`, `research_propose`, `research_revise`, `research_review`,
 `research_link_evidence`, `research_mlflow`, `research_sync`, and `research_validate`.
 
 Resources: project brief, project frontier, record, and context packet under the
@@ -86,7 +86,7 @@ Exact resource templates:
 Example MCP argument shapes:
 
 ```json
-{"tool":"research_propose","arguments":{"project":"demo","record_type":"finding","title":"Cache result","body":"Reads improved 12 percent.","creator":"codex"}}
+{"tool":"research_propose","arguments":{"project":"demo","record_type":"finding","title":"Cache result","body":"The cache reduced repeated reads by 12 percent in the measured workflow. The comparison used the same task fixture and code revision. This supports retaining the cache for subsequent trials. A replication should confirm the result on a larger repository.","creator":"codex"}}
 {"tool":"research_review","arguments":{"record_id":"UUID","actor":"reviewer","verdict":"accepted","resolves_record_ids":["GOAL_UUID"]}}
 {"tool":"research_link_evidence","arguments":{"record_id":"UUID","uri":"mlflow://runs/123","kind":"mlflow-run","actor":"reviewer","content_hash":"sha256-if-known"}}
 {"tool":"research_get_context","arguments":{"project":"demo","query":"cache","token_budget":1500}}
@@ -122,6 +122,9 @@ python -m pytest
 Lifecycle: candidate to provisional to accepted, plus disputed, rejected, superseded, and stale.
 Creators cannot accept their own proposals by default. Acceptance requires resolvable evidence.
 Mutations emit append-only events. Stored text is always treated as untrusted data.
+Substantive records should normally explain context, evidence, implications, and next steps in
+three to five sentences. `research_validate` warns about thin provisional or accepted records;
+set `metadata.concise_fact=true` only when a shorter statement is genuinely complete.
 An accepted finding can explicitly resolve one or more goals. A `resolves` link removes those
 goals from the active frontier while preserving their full history. `supports` does not close a
 goal.

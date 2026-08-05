@@ -15,6 +15,7 @@ bundle their runtime, styles, and graph JSON into one offline HTML file.
 - selection focus that dims unrelated branches
 - visible copy-ID action with confirmation
 - responsive light and dark themes
+- soft full-node shading by record type, with lifecycle retained as a separate border signal
 
 The viewer is currently read-only. Dragging, connecting, deletion, and direct persistence are
 disabled intentionally.
@@ -47,6 +48,10 @@ in the browser. The intended command boundary is:
 Candidate commands include `propose_revision`, `change_status`, `add_relationship`,
 `remove_relationship`, `link_evidence`, and `resolve_contradiction`. The backend remains the sole
 authority for every mutation.
+
+`research_revise` now provides the first persistence primitive for that editor. It uses expected
+revisions and append-only events. Revising accepted knowledge returns it to provisional status so
+the changed meaning must be reviewed again.
 
 For larger graphs, clustering and server-side graph scopes can be added without changing the
 record or link contract. A separate WebGL overview may be introduced only if real projects exceed

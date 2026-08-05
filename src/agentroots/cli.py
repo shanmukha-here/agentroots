@@ -36,6 +36,12 @@ def parser() -> argparse.ArgumentParser:
         metavar="GOAL_ID",
         help="goal resolved by an accepted record; repeat for multiple goals",
     )
+    q = sub.add_parser("revise")
+    q.add_argument("id")
+    q.add_argument("--actor", required=True)
+    q.add_argument("--title")
+    q.add_argument("--body")
+    q.add_argument("--revision", type=int)
     q = sub.add_parser("query")
     q.add_argument("project")
     q.add_argument("text", nargs="?", default="")
@@ -83,6 +89,14 @@ def execute(args: argparse.Namespace, service: ResearchService) -> Any:
             comment=args.comment,
             expected_revision=args.revision,
             resolves_record_ids=args.resolves,
+        )
+    if c == "revise":
+        return service.revise(
+            args.id,
+            actor=args.actor,
+            title=args.title,
+            body=args.body,
+            expected_revision=args.revision,
         )
     if c == "query":
         return service.query(args.project, args.text)

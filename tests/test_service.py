@@ -30,6 +30,46 @@ def test_review_governance_and_context(service: ResearchService) -> None:
     assert packet["estimated_tokens"] <= 500
 
 
+def test_revision_is_append_only_concurrent_and_reopens_accepted_record(
+    service: ResearchService, tmp_path: Path,
+) -> None:
+    record = service.propose(
+        project="p", type="finding", title="Old", body="Short fact.", creator="worker"
+    )
+    service.review(record["id"], actor="reviewer", verdict="provisional")
+    service.link_evidence(
+        EvidenceLink(record["id"], "test://revision/1", "test", "passed"), actor="reviewer"
+    )
+    accepted = service.review(record["id"], actor="reviewer", verdict="accepted")
+    revised = service.revise(
+        record["id"],
+        actor="human",
+        body="Context sentence. Evidence sentence. Implication sentence. Next step sentence.",
+        expected_revision=accepted["revision"],
+        idempotency_key="revision-1",
+    )
+    assert revised["status"] == "provisional"
+    assert revised["revision"] == accepted["revision"] + 1
+    assert service.revise(
+        record["id"], actor="human", body="ignored", idempotency_key="revision-1"
+    )["body"] == revised["body"]
+    with pytest.raises(ConflictError):
+        service.revise(record["id"], actor="human", body="stale", expected_revision=1)
+    restored = ResearchService(Database(tmp_path / "revision-restored.db"))
+    restored.import_events(service.sync_export("p"))
+    assert restored.get_record(record["id"])["body"] == revised["body"]
+
+
+def test_validation_warns_about_thin_substantive_descriptions(service: ResearchService) -> None:
+    record = service.propose(
+        project="p", type="finding", title="Thin", body="Too short.", creator="worker"
+    )
+    service.review(record["id"], actor="reviewer", verdict="provisional")
+    result = service.validate("p")
+    assert result["ok"]
+    assert {warning["record_id"] for warning in result["warnings"]} == {record["id"]}
+
+
 def test_accepted_finding_explicitly_resolves_goal_and_clears_frontier(
     service: ResearchService, tmp_path: Path,
 ) -> None:

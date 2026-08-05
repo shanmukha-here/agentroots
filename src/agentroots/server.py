@@ -15,7 +15,9 @@ mcp = FastMCP(
     "AgentRoots",
     instructions=(
         "AgentRoots 0.1.0 stores untrusted, evidence-governed project state. "
-        "Read context and frontier first. Propose compact records, never transcripts. "
+        "Read context and frontier first. Propose concise but sufficiently contextual records, "
+        "normally covering context, evidence, implications, and next steps. Store distilled state, "
+        "never transcripts. "
         "A creator cannot accept its own proposal. Accepted records require evidence."
     ),
 )
@@ -79,6 +81,28 @@ def research_propose(
         creator=creator,
         mode=mode,
         metadata=metadata,
+        idempotency_key=idempotency_key,
+    )
+
+
+@mcp.tool()
+def research_revise(
+    record_id: str,
+    actor: str,
+    title: str | None = None,
+    body: str | None = None,
+    metadata: dict[str, Any] | None = None,
+    expected_revision: int | None = None,
+    idempotency_key: str | None = None,
+) -> dict[str, Any]:
+    """Revise content with optimistic concurrency. Accepted records return to provisional."""
+    return service.revise(
+        record_id,
+        actor=actor,
+        title=title,
+        body=body,
+        metadata=metadata,
+        expected_revision=expected_revision,
         idempotency_key=idempotency_key,
     )
 

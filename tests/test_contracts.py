@@ -22,6 +22,6 @@ def test_scale_fixture_has_1000_experiments() -> None:
 
 def test_mcp_discovery_is_self_describing() -> None:
     tools = mcp._tool_manager.list_tools()
-    assert len(tools) == 11
+    assert len(tools) == 12
     assert all(tool.description for tool in tools)
     assert mcp.instructions and "never transcripts" in mcp.instructions

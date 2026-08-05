@@ -13,6 +13,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import "./viewer.css";
+import "./type-shading.css";
 import dagre from "@dagrejs/dagre";
 
 const TYPE_META = {
@@ -28,7 +29,7 @@ const NODE_HEIGHT = 112;
 
 function KnowledgeNode({ data, selected }) {
   const [label, icon] = TYPE_META[data.type] || [data.type, "•"];
-  return <article className={`knowledge-node status-${data.status} ${selected ? "is-selected" : ""}`}>
+  return <article className={`knowledge-node type-${data.type} status-${data.status} ${selected ? "is-selected" : ""}`}>
     <Handle type="target" position={Position.Left} />
     <div className="node-topline"><span className="node-icon">{icon}</span><span>{label}</span><span className="node-status">{data.status}</span></div>
     <div className="node-title">{data.title}</div>
