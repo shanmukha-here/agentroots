@@ -28,7 +28,6 @@ Issues = "https://github.com/shanmukha-here/agentroots/issues"
 
 [project.optional-dependencies]
 dev = ["build>=1.2", "mypy>=1.11", "pytest>=8", "ruff>=0.6"]
-demo = ["Pillow>=10,<12", "imageio-ffmpeg>=0.5,<1"]
 
 [project.scripts]
 agentroots = "agentroots.cli:main"

@@ -26,14 +26,13 @@ happen next, without replaying transcripts or duplicating large artifacts.
 One agent can preserve useful state across sessions. Multiple agents can propose, review, and
 reuse the same findings. AgentRoots does not spawn, schedule, route, or execute agents.
 
-## See the handoff
+## See project state at a glance
 
-![AgentRoots preserves grounded project state so a fresh agent can continue without replaying the transcript](docs/assets/agentroots-readme-demo.webp)
+![AgentRoots knowledge graph showing connected questions, findings, observations, and evidence-governed lifecycle states](docs/assets/agentroots-knowledge-graph.png)
 
-This animation is rendered from a real AgentRoots event ledger, context packet, and interactive
-graph projection. The workflow is synthetic and reproducible with
-`python tools/render_readme_demo.py`. A non-looping [MP4 version](docs/assets/agentroots-readme-demo.mp4)
-is also available.
+This synthetic overview exercises all 14 record types and all 12 relationship types in the current
+contract. The human-readable graph is generated from the same versioned event ledger that agents
+query, making the complete project model inspectable without creating a second source of truth.
 
 ## Why I built AgentRoots
 
