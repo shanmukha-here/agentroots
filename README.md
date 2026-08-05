@@ -1,5 +1,9 @@
 # AgentRoots
 
+<p align="center">
+  <img src="docs/assets/brand/agentroots-mark.svg" alt="AgentRoots logo" width="180">
+</p>
+
 **Different agents. Same roots.**
 
 Built by Shanmukha Vellamcheti and OpenAI Codex.

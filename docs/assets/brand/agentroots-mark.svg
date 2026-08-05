@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
+  <title id="title">AgentRoots</title>
+  <desc id="desc">A shared knowledge fruit containing agent branches, grounded roots, four contribution chambers, and a governed AR gate.</desc>
+  <defs>
+    <clipPath id="ar-op-clip"><circle cx="50" cy="50" r="43"/></clipPath>
+    <symbol id="ar-op" viewBox="0 0 100 100">
+      <g clip-path="url(#ar-op-clip)" opacity=".34">
+        <path d="M8 50 H92" stroke="#243b6b" stroke-width="2"/>
+        <path d="M50 8 V92" stroke="#1f5d3a" stroke-width="2"/>
+      </g>
+      <g fill="none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M50 6 A44 44 0 0 0 50 94 M23 72 L38 27 L53 72 M30 53 H48" stroke="#243b6b"/>
+        <path d="M50 6 A44 44 0 0 1 50 94 M56 72 V27 H68 Q80 27 80 40 Q80 53 68 53 H56 M68 53 L82 72" stroke="#1f5d3a"/>
+      </g>
+    </symbol>
+  </defs>
+
+  <path d="M80 13 C69 6 56 8 45 15 C20 30 9 55 11 84 C13 116 34 141 64 150 C73 153 87 153 96 149 C126 140 147 115 149 83 C151 54 139 29 115 15 C104 8 91 7 80 13Z" fill="none" stroke="#e3eadc" stroke-width="7.4" stroke-linejoin="round"/>
+  <path d="M80 13 C69 6 56 8 45 15 C20 30 9 55 11 84 C13 116 34 141 64 150 C73 153 87 153 96 149 C126 140 147 115 149 83 C151 54 139 29 115 15 C104 8 91 7 80 13Z" fill="#f7f2e4" stroke="#24564f" stroke-width="4.4" stroke-linejoin="round"/>
+  <path d="M79 14 Q82 6 90 3" fill="none" stroke="#e3eadc" stroke-width="5" stroke-linecap="round"/>
+  <path d="M88 6 C99 0 111 2 117 9 C108 17 98 18 88 6Z" fill="none" stroke="#e3eadc" stroke-width="4.8" stroke-linejoin="round"/>
+  <path d="M79 14 Q82 6 90 3" fill="none" stroke="#24564f" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M88 6 C99 0 111 2 117 9 C108 17 98 18 88 6Z" fill="#dce8d4" stroke="#24564f" stroke-width="2" stroke-linejoin="round"/>
+
+  <path d="M76 27 C55 27 36 36 24 51 L58 69 Q66 59 76 55Z" fill="#e8eee3" stroke="#678963" stroke-width="1.2" opacity=".68" transform="rotate(-12 80 80)"/>
+  <path d="M84 27 C105 27 124 36 136 51 L102 69 Q94 59 84 55Z" fill="#e8eee3" stroke="#678963" stroke-width="1.2" opacity=".68" transform="rotate(12 80 80)"/>
+  <path d="M76 128 C58 128 41 120 30 108 L60 92 Q67 100 76 103Z" fill="#e8eee3" stroke="#678963" stroke-width="1.2" opacity=".68" transform="translate(0 5) rotate(12 80 80)"/>
+  <path d="M84 128 C102 128 119 120 130 108 L100 92 Q93 100 84 103Z" fill="#e8eee3" stroke="#678963" stroke-width="1.2" opacity=".68" transform="translate(0 5) rotate(-12 80 80)"/>
+  <path d="M80 18 V68 M80 92 V142" fill="none" stroke="#6f945e" stroke-width="2" stroke-linecap="round" opacity=".72"/>
+
+  <svg x="21" y="31" width="118" height="99" viewBox="0 0 520 390" overflow="visible">
+    <g fill="none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+      <g stroke="#243b6b">
+        <path d="M30 125 L72 56 L142 118 L225 38 M142 118 L252 158"/>
+        <path d="M455 130 L388 58 L324 124 L252 158" stroke-dasharray="10 13"/>
+        <g fill="#f4f0e3"><circle cx="30" cy="125" r="13"/><circle cx="72" cy="56" r="13"/><circle cx="142" cy="118" r="13"/><circle cx="225" cy="38" r="13"/><circle cx="388" cy="58" r="13"/><circle cx="324" cy="124" r="13"/><circle cx="455" cy="130" r="13"/></g>
+        <path d="M28 218 H208 M312 218 H492"/>
+      </g>
+      <path d="M252 158 V168" stroke="#24564f" stroke-dasharray="4 9"/>
+      <g stroke="#1f5d3a">
+        <path d="M260 270 V292 H120 L55 348 M260 292 H400 M215 292 L195 344 M260 292 V366 M305 292 L325 350 M400 292 L465 342"/>
+        <path d="M170 292 L125 366 M350 292 L395 368" stroke-dasharray="9 12"/>
+        <g fill="#f4f0e3"><circle cx="55" cy="348" r="13"/><circle cx="125" cy="366" r="11"/><circle cx="195" cy="344" r="12"/><circle cx="260" cy="366" r="14"/><circle cx="325" cy="350" r="12"/><circle cx="395" cy="368" r="11"/><circle cx="465" cy="342" r="13"/></g>
+      </g>
+    </g>
+    <use href="#ar-op" x="208" y="166" width="104" height="104"/>
+  </svg>
+</svg>
