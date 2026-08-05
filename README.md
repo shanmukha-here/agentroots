@@ -6,7 +6,8 @@
 
 Evidence-governed continuity for agents that explore, build, and research together.
 
-Built by Shanmukha Vellamcheti and OpenAI Codex.
+Built by Shanmukha Vellamcheti and
+<a href="https://openai.com/codex/"><img src="docs/assets/brand/openai-blossom-96.png" alt="OpenAI" width="18"> OpenAI Codex</a>.
 
 <br clear="left">
 
@@ -16,7 +17,7 @@ project's state. AgentRoots gives agents one durable, reviewed frontier instead.
 
 **Memory preserves experience. AgentRoots governs the frontier.**
 
-![AgentRoots connects past attempts, present evidence, and the future frontier through shared roots](docs/assets/agentroots-past-present-future.jpg)
+![AgentRoots connects past attempts, present evidence, and the future frontier through shared roots](docs/assets/agentroots-past-present-future-v2.jpg)
 
 AgentRoots is an open-source Agent Continuity MCP for Codex, Claude, DeepSeek, and generic MCP
 clients. It preserves where a project came from, what is currently supported, and what should
