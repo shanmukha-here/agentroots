@@ -69,7 +69,7 @@ runs in WAL mode. Generated state stays outside the repository.
 
 Tools: `research_get_context`, `research_get_frontier`, `research_query`,
 `research_get_record`, `research_propose`, `research_review`,
-`research_link_evidence`, `research_sync`, and `research_validate`.
+`research_link_evidence`, `research_mlflow`, `research_sync`, and `research_validate`.
 
 Resources: project brief, project frontier, record, and context packet under the
 `research://` URI scheme. Protocol names remain research-specific because the initial ontology
@@ -90,6 +90,7 @@ Example MCP argument shapes:
 {"tool":"research_review","arguments":{"record_id":"UUID","actor":"reviewer","verdict":"accepted","resolves_record_ids":["GOAL_UUID"]}}
 {"tool":"research_link_evidence","arguments":{"record_id":"UUID","uri":"mlflow://runs/123","kind":"mlflow-run","actor":"reviewer","content_hash":"sha256-if-known"}}
 {"tool":"research_get_context","arguments":{"project":"demo","query":"cache","token_budget":1500}}
+{"tool":"research_mlflow","arguments":{"operation":"link","record_id":"UUID","run_id":"RUN_ID","actor":"reviewer","include_artifacts":true}}
 ```
 
 `research_sync` imports supplied events, exports current project events, and can mark packet
@@ -124,7 +125,7 @@ Implemented today:
 - sectioned, token-budgeted, audited context packets
 - review governance, contradictions, failed-attempt recall, and Git staleness
 - exact JSONL event sync plus backup and restore
-- read-only MLflow and Trackio adapters
+- read-only MLflow evidence integration and Trackio adapter
 - H-E-F and signac importers
 - stdio MCP server, CLI, schemas, tests, fixtures, and three-agent demo
 

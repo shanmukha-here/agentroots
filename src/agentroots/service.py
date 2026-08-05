@@ -11,6 +11,7 @@ from uuid import uuid4
 
 from rapidfuzz.fuzz import WRatio
 
+from .adapters.base import ExternalRun
 from .db import Database
 from .models import EvidenceLink, Mode, Record, RecordType, Status
 from .security import scan_text
@@ -181,6 +182,15 @@ class ResearchService:
                 ).fetchone()
             ):
                 raise GovernanceError("accepted record requires resolvable evidence")
+            if target == Status.ACCEPTED:
+                for evidence in conn.execute(
+                    "SELECT metadata FROM evidence WHERE record_id=?", (record_id,)
+                ):
+                    metadata = json.loads(evidence["metadata"])
+                    if metadata.get("adapter") == "mlflow" and metadata.get(
+                        "external_status"
+                    ) not in {"FINISHED", "FAILED", "KILLED"}:
+                        raise GovernanceError("accepted MLflow evidence requires a terminal run")
             if (
                 target == Status.ACCEPTED
                 and record["type"] == "decision"
@@ -234,6 +244,19 @@ class ResearchService:
             row = conn.execute("SELECT * FROM records WHERE id=?", (link.record_id,)).fetchone()
             if not row:
                 raise KeyError(link.record_id)
+            existing = conn.execute(
+                "SELECT uri,kind,summary,content_hash,metadata FROM evidence "
+                "WHERE record_id=? AND uri=?",
+                (link.record_id, link.uri),
+            ).fetchone()
+            encoded_meta = json.dumps(meta, sort_keys=True)
+            if existing and (
+                existing["kind"],
+                existing["summary"],
+                existing["content_hash"],
+                existing["metadata"],
+            ) == (link.kind, summary.text, link.content_hash, encoded_meta):
+                return self.get_record(link.record_id)
             conn.execute(
                 "INSERT OR REPLACE INTO evidence(record_id,uri,kind,summary,content_hash,metadata) VALUES(?,?,?,?,?,?)",
                 (
@@ -242,7 +265,7 @@ class ResearchService:
                     link.kind,
                     summary.text,
                     link.content_hash,
-                    json.dumps(meta),
+                    encoded_meta,
                 ),
             )
             record = self.db.decode(row)
@@ -261,6 +284,142 @@ class ResearchService:
             )
         return self.get_record(link.record_id)
 
+    @staticmethod
+    def _safe_external_mapping(values: dict[str, Any]) -> dict[str, Any]:
+        sensitive = ("secret", "password", "passwd", "token", "api_key", "apikey", "credential")
+        result: dict[str, Any] = {}
+        for key, value in values.items():
+            if any(part in key.lower() for part in sensitive):
+                result[key] = "[REDACTED]"
+                continue
+            scanned = scan_text(str(value))
+            result[key] = scanned.text
+        return result
+
+    def link_external_run(
+        self, record_id: str, run: ExternalRun, *, actor: str
+    ) -> dict[str, Any]:
+        """Attach a bounded immutable snapshot of an external tracker run as evidence."""
+        params = self._safe_external_mapping(run.params)
+        tags = self._safe_external_mapping(run.tags)
+        metrics = {key: float(value) for key, value in run.metrics.items()}
+        datasets = [dict(item) for item in run.datasets]
+        artifacts = [dict(item) for item in run.artifacts]
+        git_commit = tags.get("mlflow.source.git.commit", "")
+        summary_parts = [
+            f"{run.adapter} run {run.run_id}",
+            f"status={run.status}",
+            f"experiment={run.experiment_id or 'unknown'}",
+        ]
+        if metrics:
+            summary_parts.append(
+                "metrics=" + ", ".join(f"{key}:{value:g}" for key, value in sorted(metrics.items()))
+            )
+        if datasets:
+            summary_parts.append(
+                "datasets="
+                + ", ".join(
+                    f"{item.get('name', 'unknown')}@{item.get('digest', 'unknown')}"
+                    for item in datasets
+                )
+            )
+        metadata = {
+            "adapter": run.adapter,
+            "run_id": run.run_id,
+            "experiment_id": run.experiment_id,
+            "run_name": run.run_name,
+            "external_status": run.status,
+            "start_time": run.start_time,
+            "end_time": run.end_time,
+            "artifact_uri": run.artifact_uri,
+            "git_commit": git_commit,
+            "metrics": metrics,
+            "params": params,
+            "tags": tags,
+            "datasets": datasets,
+            "artifacts": artifacts,
+        }
+        return self.link_evidence(
+            EvidenceLink(
+                record_id=record_id,
+                uri=run.uri,
+                kind="tracker-run",
+                summary="; ".join(summary_parts),
+                content_hash=run.provenance_hash(),
+                metadata=metadata,
+            ),
+            actor=actor,
+        )
+
+    def import_external_run(
+        self,
+        record_id: str,
+        run: ExternalRun,
+        *,
+        actor: str,
+        experiment_record_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Create an idempotent RunRef and connect it to the claim and optional experiment."""
+        target = self.get_record(record_id)
+        if experiment_record_id:
+            experiment = self.get_record(experiment_record_id)
+            if experiment["project"] != target["project"] or experiment["type"] != "experiment":
+                raise ValueError("experiment_record_id must reference an experiment in the project")
+        identity = hashlib.sha256(f"{run.adapter}:{run.uri}".encode()).hexdigest()
+        run_ref = self.propose(
+            project=target["project"],
+            type="run_ref",
+            title=f"{run.adapter} run {run.run_name or run.run_id}",
+            body=(
+                f"External {run.adapter} run {run.run_id} in experiment "
+                f"{run.experiment_id or 'unknown'} with status {run.status}."
+            ),
+            creator=actor,
+            metadata={
+                "adapter": run.adapter,
+                "run_id": run.run_id,
+                "experiment_id": run.experiment_id,
+                "external_uri": run.uri,
+            },
+            idempotency_key=f"external-run:{identity}",
+        )
+        self.link_external_run(run_ref["id"], run, actor=actor)
+        linked_record = self.link_external_run(record_id, run, actor=actor)
+        self.link(run_ref["id"], record_id, "supports", actor)
+        if experiment_record_id:
+            self.link(experiment_record_id, run_ref["id"], "produced", actor)
+        return {"record": linked_record, "run_ref": self.get_record(run_ref["id"])}
+
+    def validate_external_run(
+        self, record_id: str, run: ExternalRun, *, actor: str = "external-staleness-check"
+    ) -> dict[str, Any]:
+        """Compare current tracker state with linked evidence and stale accepted claims on drift."""
+        record = self.get_record(record_id)
+        evidence = next(
+            (
+                item
+                for item in record["evidence"]
+                if item["metadata"].get("adapter") == run.adapter
+                and item["metadata"].get("run_id") == run.run_id
+            ),
+            None,
+        )
+        if evidence is None:
+            raise KeyError(f"{run.adapter} run evidence not linked: {run.run_id}")
+        current_hash = run.provenance_hash()
+        matched = evidence.get("content_hash") == current_hash
+        stale_record = None
+        if not matched and record["status"] == "accepted":
+            stale_record = self.review(record_id, actor=actor, verdict="stale")
+        return {
+            "record_id": record_id,
+            "run_id": run.run_id,
+            "matched": matched,
+            "stored_hash": evidence.get("content_hash"),
+            "current_hash": current_hash,
+            "record_status": (stale_record or record)["status"],
+        }
+
     def link(self, source_id: str, target_id: str, relation: str, actor: str) -> None:
         if relation not in RELATIONS:
             raise ValueError(f"unsupported relation: {relation}")
@@ -271,17 +430,18 @@ class ResearchService:
                 or not conn.execute("SELECT 1 FROM records WHERE id=?", (target_id,)).fetchone()
             ):
                 raise KeyError("record")
-            conn.execute(
+            inserted = conn.execute(
                 "INSERT OR IGNORE INTO links VALUES(?,?,?,?)",
                 (source_id, target_id, relation, "{}"),
             )
-            self._event(
-                conn,
-                self.db.decode(row),
-                "linked",
-                actor,
-                {"target_id": target_id, "relation": relation},
-            )
+            if inserted.rowcount:
+                self._event(
+                    conn,
+                    self.db.decode(row),
+                    "linked",
+                    actor,
+                    {"target_id": target_id, "relation": relation},
+                )
 
     def query(
         self, project: str, text: str = "", *, statuses: Iterable[str] = (), limit: int = 20

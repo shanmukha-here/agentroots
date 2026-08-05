@@ -9,3 +9,11 @@ from platformdirs import user_data_path
 def db_path() -> Path:
     configured = os.environ.get("AGENTROOTS_DB") or os.environ.get("RESEARCH_STATE_DB")
     return Path(configured) if configured else user_data_path("agentroots") / "state.sqlite3"
+
+
+def mlflow_url() -> str | None:
+    return os.environ.get("AGENTROOTS_MLFLOW_URL")
+
+
+def mlflow_token() -> str | None:
+    return os.environ.get("AGENTROOTS_MLFLOW_TOKEN")

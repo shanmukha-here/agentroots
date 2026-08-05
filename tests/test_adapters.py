@@ -17,8 +17,17 @@ class Response(BytesIO):
 def test_mlflow_read_only() -> None:
     payload = {
         "run": {
-            "info": {"experiment_id": "e", "status": "FINISHED"},
-            "data": {"metrics": [{"key": "acc", "value": 0.9}], "params": []},
+            "info": {
+                "run_id": "r",
+                "experiment_id": "e",
+                "status": "FINISHED",
+                "artifact_uri": "file:///artifacts/r",
+            },
+            "data": {
+                "metrics": [{"key": "acc", "value": 0.9}],
+                "params": [],
+                "tags": [],
+            },
         }
     }
     with patch(
@@ -27,6 +36,7 @@ def test_mlflow_read_only() -> None:
     ):
         run = MLflowAdapter("http://localhost:5000").get_run("r")
     assert run.metrics["acc"] == 0.9
+    assert run.provenance_hash()
 
 
 def test_trackio_injected() -> None:
