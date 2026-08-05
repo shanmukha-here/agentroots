@@ -68,7 +68,7 @@ runs in WAL mode. Generated state stays outside the repository.
 ## MCP surface
 
 Tools: `research_get_context`, `research_get_frontier`, `research_query`,
-`research_get_record`, `research_propose`, `research_review`,
+`research_get_record`, `research_get_graph`, `research_propose`, `research_review`,
 `research_link_evidence`, `research_mlflow`, `research_sync`, and `research_validate`.
 
 Resources: project brief, project frontier, record, and context packet under the
@@ -102,7 +102,12 @@ CLI query text is positional. Run `agentroots <command> --help` for command-spec
 agentroots context demo "cache latency" --tokens 1500
 agentroots validate demo
 agentroots export demo events.jsonl
+agentroots graph demo project-map.html
 ```
+
+The graph command creates a self-contained, read-only interactive map. It works offline and
+supports searching, lifecycle and type filters, pan and zoom, evidence inspection, version
+metadata, and copying record IDs for review or correction.
 
 On Windows, prefer these positional CLI commands or MCP tool calls over hand-escaped JSON in
 PowerShell. For contributor tests in a clean checkout:

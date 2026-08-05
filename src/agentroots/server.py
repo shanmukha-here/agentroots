@@ -54,6 +54,12 @@ def research_get_record(record_id: str) -> dict[str, Any]:
 
 
 @mcp.tool()
+def research_get_graph(project: str) -> dict[str, Any]:
+    """Return the current project graph for human or client visualization."""
+    return service.graph(project)
+
+
+@mcp.tool()
 def research_propose(
     project: str,
     record_type: str,

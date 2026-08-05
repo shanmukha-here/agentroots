@@ -8,6 +8,7 @@ from typing import Any
 
 from .config import db_path
 from .db import Database
+from .graph import write_graph_html
 from .service import ResearchService
 
 
@@ -57,6 +58,9 @@ def parser() -> argparse.ArgumentParser:
     q.add_argument("path", type=Path)
     q = sub.add_parser("restore")
     q.add_argument("path", type=Path)
+    q = sub.add_parser("graph", help="write an interactive project knowledge map")
+    q.add_argument("project")
+    q.add_argument("path", type=Path)
     return p
 
 
@@ -105,6 +109,9 @@ def execute(args: argparse.Namespace, service: ResearchService) -> Any:
     if c == "restore":
         service.restore(args.path)
         return {"restored": str(args.path)}
+    if c == "graph":
+        path = write_graph_html(service.graph(args.project), args.path)
+        return {"project": args.project, "path": str(path)}
     raise AssertionError(c)
 
 

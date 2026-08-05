@@ -153,6 +153,47 @@ class ResearchService:
             ]
             return record
 
+    def graph(self, project: str) -> dict[str, Any]:
+        """Return the current project graph as a read-only projection."""
+        with self.db.connect() as conn:
+            graph_version = conn.execute(
+                "SELECT COALESCE(MAX(seq), 0) FROM events WHERE project=?", (project,)
+            ).fetchone()[0]
+            nodes = [
+                self.db.decode(row)
+                for row in conn.execute(
+                    "SELECT * FROM records WHERE project=? ORDER BY created_at, id", (project,)
+                )
+            ]
+            ids = {node["id"] for node in nodes}
+            edges: list[dict[str, Any]] = []
+            evidence: dict[str, list[dict[str, Any]]] = {}
+            if ids:
+                marks = ",".join("?" for _ in ids)
+                edges = [
+                    self.db.decode(row)
+                    for row in conn.execute(
+                        f"SELECT * FROM links WHERE source_id IN ({marks}) "
+                        f"AND target_id IN ({marks})",
+                        (*ids, *ids),
+                    )
+                ]
+                for row in conn.execute(
+                    f"SELECT * FROM evidence WHERE record_id IN ({marks}) ORDER BY id",
+                    tuple(ids),
+                ):
+                    item = self.db.decode(row)
+                    evidence.setdefault(item["record_id"], []).append(item)
+        for node in nodes:
+            node["evidence"] = evidence.get(node["id"], [])
+        return {
+            "project": project,
+            "graph_version": graph_version,
+            "generated_at": datetime.now(UTC).isoformat(),
+            "nodes": nodes,
+            "edges": edges,
+        }
+
     def review(
         self,
         record_id: str,
