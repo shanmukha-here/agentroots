@@ -1,12 +1,29 @@
+<img src="docs/assets/brand/agentroots-mark.svg" alt="AgentRoots logo" width="170" align="left">
+
 # AgentRoots
 
-<p align="center">
-  <img src="docs/assets/brand/agentroots-mark.svg" alt="AgentRoots logo" width="180">
-</p>
+### Different agents. Same roots.
 
-**Different agents. Same roots.**
+Evidence-governed continuity for agents that explore, build, and research together.
 
 Built by Shanmukha Vellamcheti and OpenAI Codex.
+
+<br clear="left">
+
+Agents make exploration dramatically faster, but temporary contexts make useful work disposable.
+Files get reread, failed paths get repeated, facts blur, and every fresh agent must reconstruct the
+project's state. AgentRoots gives agents one durable, reviewed frontier instead.
+
+**Memory preserves experience. AgentRoots governs the frontier.**
+
+![AgentRoots connects past attempts, present evidence, and the future frontier through shared roots](docs/assets/agentroots-past-present-future.jpg)
+
+AgentRoots is an open-source Agent Continuity MCP for Codex, Claude, DeepSeek, and generic MCP
+clients. It preserves where a project came from, what is currently supported, and what should
+happen next, without replaying transcripts or duplicating large artifacts.
+
+One agent can preserve useful state across sessions. Multiple agents can propose, review, and
+reuse the same findings. AgentRoots does not spawn, schedule, route, or execute agents.
 
 ## Why I built AgentRoots
 
@@ -24,27 +41,13 @@ latest working frontier becomes difficult to recover.
 
 Memory tools preserve experience. Planning tools preserve intent. Provenance tools preserve what
 ran and changed. AgentRoots connects those concerns as evidence-governed project state: what is
-the project's origin, what is currently accepted, what evidence supports it, what is stale or disputed, which goals remain
-active, and what questions or experiments should happen next. This lets agents across models and
-harnesses inherit a compact, grounded frontier, then verify only what their task requires instead
-of rebuilding the entire context from scratch.
+the project's origin, what is currently accepted, what evidence supports it, what is stale or
+disputed, which goals remain active, and what questions or experiments should happen next. This
+lets agents across models and harnesses inherit a compact, grounded frontier, then verify only what
+their task requires instead of rebuilding the entire context from scratch.
 
 I built AgentRoots because I needed agents to share more than memories. I needed them to inhabit
 the same evolving state, avoid duplicated exploration, and continue from the real frontier.
-
-**Memory preserves experience. AgentRoots governs the frontier.**
-
-AgentRoots connects where the project has been, where it stands, and what remains to be explored.
-It turns disposable agent exploration into durable, reviewed, evidence-backed project state.
-
-![AgentRoots connects past attempts, present evidence, and the future frontier through shared roots](docs/assets/agentroots-past-present-future.jpg)
-
-AgentRoots is an open-source Agent Continuity MCP. It lets Codex, Claude, DeepSeek, and generic
-MCP clients continue from compact, reviewed, evidence-backed state instead of replaying
-transcripts or repeating prior work.
-
-One agent can preserve useful state across sessions. Multiple agents can propose, review, and
-reuse the same findings. AgentRoots does not spawn, schedule, route, or execute agents.
 
 ## Why AgentRoots
 
