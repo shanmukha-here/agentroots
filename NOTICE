@@ -2,3 +2,7 @@ AgentRoots
 Copyright 2026 Shanmukha Vellamcheti and AgentRoots contributors
 
 AgentRoots was developed with implementation assistance from OpenAI Codex.
+
+The bundled graph viewer includes React, React DOM, React Flow, Dagre, and their
+transitive runtime components under permissive open-source licenses. License
+notices emitted by the frontend build are preserved in the bundled assets.

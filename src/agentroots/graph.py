@@ -6,28 +6,37 @@ from pathlib import Path
 from typing import Any
 
 
+def _asset(name: str) -> str:
+    return (Path(__file__).with_name("assets") / name).read_text(encoding="utf-8")
+
+
 def write_graph_html(graph: dict[str, Any], destination: Path) -> Path:
     """Write a self-contained, read-only interactive project map."""
     destination.parent.mkdir(parents=True, exist_ok=True)
     payload = json.dumps(graph, ensure_ascii=False).replace("</", "<\\/")
-    document = _DOCUMENT.replace("__PROJECT__", escape(str(graph["project"]))).replace(
-        "__GRAPH_DATA__", payload
+    document = (
+        _DOCUMENT.replace("__PROJECT__", escape(str(graph["project"])))
+        .replace("__GRAPH_DATA__", payload)
+        .replace("__VIEWER_CSS__", _asset("graph-viewer.css"))
+        .replace("__VIEWER_JS__", _asset("graph-viewer.js"))
     )
     destination.write_text(document, encoding="utf-8")
     return destination
 
 
-_DOCUMENT = r"""<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>__PROJECT__ | AgentRoots map</title><style>
-:root{color-scheme:light dark;--bg:#f5f4ee;--panel:#fffdf7;--ink:#24251f;--muted:#6b6d62;--line:#c8c9bf;--active:#326b43;--candidate:#77786f;--provisional:#a36a00;--bad:#a83d3d;--selected:#3568a8}@media(prefers-color-scheme:dark){:root{--bg:#171914;--panel:#20231d;--ink:#f1f1e8;--muted:#a9ab9f;--line:#484b42;--active:#74b987;--candidate:#999c91;--provisional:#e0a83e;--bad:#e17878;--selected:#78a6df}}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.4 system-ui,sans-serif}header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--panel)}h1{font-size:18px;margin:0;margin-right:auto}input,select,button{font:inherit;color:inherit;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:7px 9px}button{cursor:pointer}.workspace{display:grid;grid-template-columns:minmax(0,1fr) 320px;height:calc(100vh - 59px)}#map{width:100%;height:100%;overflow:hidden;touch-action:none}.edge{fill:none;stroke:var(--line);stroke-width:1.2}.edge.contradicts,.edge.invalidates{stroke:var(--bad);stroke-dasharray:5 4}.node{cursor:pointer}.node rect{fill:var(--panel);stroke:var(--candidate);stroke-width:1.5}.node.accepted rect{stroke:var(--active)}.node.provisional rect{stroke:var(--provisional)}.node.disputed rect,.node.rejected rect,.node.stale rect{stroke:var(--bad)}.node.selected rect{stroke:var(--selected);stroke-width:3}.node text{fill:var(--ink);pointer-events:none}.node .kind{fill:var(--muted);font-size:10px;text-transform:uppercase}aside{border-left:1px solid var(--line);background:var(--panel);padding:16px;overflow:auto}aside h2{font-size:17px;margin:0 0 8px}aside h3{font-size:13px;margin:18px 0 6px;color:var(--muted);text-transform:uppercase}aside p{white-space:pre-wrap}code{word-break:break-all}.badge{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:2px 7px;margin:0 4px 4px 0}.empty,#summary{color:var(--muted)}@media(max-width:760px){.workspace{grid-template-columns:1fr;grid-template-rows:60vh auto;height:auto}#map{min-height:60vh}aside{border-left:0;border-top:1px solid var(--line)}}</style></head>
-<body><header><h1>__PROJECT__</h1><span id="version"></span><input id="search" type="search" placeholder="Search knowledge" aria-label="Search knowledge"><select id="status" aria-label="Filter status"><option value="">All statuses</option></select><select id="type" aria-label="Filter type"><option value="">All types</option></select><button id="reset" type="button">Reset view</button><span id="summary"></span></header><main class="workspace"><svg id="map" role="img" aria-label="Interactive AgentRoots project knowledge map"><g id="viewport"></g></svg><aside id="detail"><h2>Project overview</h2><p class="empty">Select a node to inspect its current version, evidence, and relationships.</p></aside></main>
-<script id="graph-data" type="application/json">__GRAPH_DATA__</script><script>
-const data=JSON.parse(document.getElementById('graph-data').textContent),svg=document.getElementById('map'),vp=document.getElementById('viewport'),detail=document.getElementById('detail');const ranks={goal:0,question:1,hypothesis:2,experiment:3,run_ref:4,observation:5,claim:6,finding:6,decision:7,artifact_ref:8,evidence:8,agent:0,session:1};let scale=1,tx=30,ty=30,drag=null,selected='';const statuses=[...new Set(data.nodes.map(n=>n.status))].sort(),types=[...new Set(data.nodes.map(n=>n.type))].sort();for(const value of statuses)document.getElementById('status').insertAdjacentHTML('beforeend',`<option>${value}</option>`);for(const value of types)document.getElementById('type').insertAdjacentHTML('beforeend',`<option>${value}</option>`);
-document.getElementById('version').textContent=`map v${data.graph_version}`;
-function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function short(v,n=34){v=String(v);return v.length>n?v.slice(0,n-1)+'...':v}function applyTransform(){vp.setAttribute('transform',`translate(${tx} ${ty}) scale(${scale})`)}function visible(){const q=document.getElementById('search').value.toLowerCase(),s=document.getElementById('status').value,t=document.getElementById('type').value;return data.nodes.filter(n=>(!q||(n.title+' '+n.body+' '+n.id).toLowerCase().includes(q))&&(!s||n.status===s)&&(!t||n.type===t))}
-function fitPositions(pos){const points=Object.values(pos);if(!points.length)return;const width=Math.max(...points.map(p=>p.x))+180,height=Math.max(...points.map(p=>p.y))+58;scale=Math.max(.25,Math.min(1,(svg.clientWidth-60)/width,(svg.clientHeight-60)/height));tx=30;ty=30;applyTransform()}
-function render(fit=false){const nodes=visible(),ids=new Set(nodes.map(n=>n.id)),columns={};for(const n of nodes)(columns[ranks[n.type]??5]??=[]).push(n);for(const col of Object.values(columns))col.sort((a,b)=>a.title.localeCompare(b.title));const pos={};for(const [rank,col]of Object.entries(columns))col.forEach((n,i)=>pos[n.id]={x:Number(rank)*230,y:i*88});let out='';for(const e of data.edges){if(!ids.has(e.source_id)||!ids.has(e.target_id)||!pos[e.source_id]||!pos[e.target_id])continue;const a=pos[e.source_id],b=pos[e.target_id];out+=`<path class="edge ${esc(e.relation)}" d="M${a.x+180},${a.y+29} C${a.x+205},${a.y+29} ${b.x-25},${b.y+29} ${b.x},${b.y+29}"><title>${esc(e.relation)}</title></path>`}for(const n of nodes){const p=pos[n.id];out+=`<g class="node ${esc(n.status)} ${n.id===selected?'selected':''}" data-id="${esc(n.id)}" transform="translate(${p.x} ${p.y})"><rect width="180" height="58" rx="8"/><text class="kind" x="10" y="16">${esc(n.type)} · ${esc(n.status)}</text><text x="10" y="38">${esc(short(n.title))}</text><title>${esc(n.title)}</title></g>`}vp.innerHTML=out;document.getElementById('summary').textContent=`${nodes.length} of ${data.nodes.length} records`;vp.querySelectorAll('.node').forEach(el=>el.addEventListener('click',()=>select(el.dataset.id)));if(fit)fitPositions(pos)}
-function select(id){selected=id;const n=data.nodes.find(x=>x.id===id),edges=data.edges.filter(e=>e.source_id===id||e.target_id===id);detail.innerHTML=`<h2>${esc(n.title)}</h2><span class="badge">${esc(n.type)}</span><span class="badge">${esc(n.status)}</span><span class="badge">revision ${n.revision}</span><p>${esc(n.body)}</p><h3>Record ID</h3><code>${esc(n.id)}</code> <button id="copy" type="button">Copy</button><h3>Evidence</h3>${n.evidence.length?n.evidence.map(e=>`<p><span class="badge">${esc(e.kind)}</span> ${esc(e.summary||e.uri)}<br><code>${esc(e.uri)}</code></p>`).join(''):'<p class="empty">No evidence linked</p>'}<h3>Relationships</h3>${edges.length?edges.map(e=>`<p><strong>${esc(e.relation)}</strong> ${esc(e.source_id===id?'to':'from')} <code>${esc(e.source_id===id?e.target_id:e.source_id)}</code></p>`).join(''):'<p class="empty">No relationships</p>'}<h3>Version</h3><p>Created by ${esc(n.creator)}<br>Mode: ${esc(n.mode)}<br>Updated: ${esc(n.updated_at)}</p>`;document.getElementById('copy').onclick=()=>navigator.clipboard.writeText(n.id);render()}
-for(const id of ['search','status','type'])document.getElementById(id).addEventListener(id==='search'?'input':'change',()=>render(true));document.getElementById('reset').onclick=()=>render(true);svg.addEventListener('wheel',e=>{e.preventDefault();scale=Math.max(.25,Math.min(2.5,scale*(e.deltaY<0?1.1:.9)));applyTransform()},{passive:false});svg.addEventListener('pointerdown',e=>{drag={x:e.clientX-tx,y:e.clientY-ty};svg.setPointerCapture(e.pointerId)});svg.addEventListener('pointermove',e=>{if(drag){tx=e.clientX-drag.x;ty=e.clientY-drag.y;applyTransform()}});svg.addEventListener('pointerup',()=>drag=null);render(true);
-</script></body></html>"""
+_DOCUMENT = """<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="generator" content="AgentRoots">
+<title>__PROJECT__ | AgentRoots knowledge map</title>
+<style>__VIEWER_CSS__</style>
+</head>
+<body>
+<div id="agentroots-viewer"></div>
+<script id="graph-data" type="application/json">__GRAPH_DATA__</script>
+<script>__VIEWER_JS__</script>
+</body>
+</html>
+"""

@@ -20,7 +20,9 @@ def test_graph_projection_and_self_contained_html(tmp_path: Path) -> None:
 
     output = write_graph_html(graph, tmp_path / "map.html")
     document = output.read_text(encoding="utf-8")
-    assert "Interactive AgentRoots project knowledge map" in document
+    assert 'id="agentroots-viewer"' in document
+    assert "ReactFlowProvider" in document
+    assert "Copy ID" in document
     assert goal["id"] in document
     assert "fetch(" not in document
 

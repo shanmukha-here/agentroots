@@ -105,9 +105,11 @@ agentroots export demo events.jsonl
 agentroots graph demo project-map.html
 ```
 
-The graph command creates a self-contained, read-only interactive map. It works offline and
-supports searching, lifecycle and type filters, pan and zoom, evidence inspection, version
-metadata, and copying record IDs for review or correction.
+The graph command creates a self-contained, read-only React Flow knowledge map. It works offline
+and supports automatic layouts, searching, lifecycle and type filters, pan and zoom, evidence
+inspection, version metadata, relationship tracing, and copying record IDs for review or
+correction. See [graph viewer architecture](docs/graph-viewer.md) for customization and the
+governed editing roadmap.
 
 On Windows, prefer these positional CLI commands or MCP tool calls over hand-escaped JSON in
 PowerShell. For contributor tests in a clean checkout:
