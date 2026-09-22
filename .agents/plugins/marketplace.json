@@ -1,0 +1,20 @@
+{
+  "name": "agentroots",
+  "interface": {
+    "displayName": "AgentRoots"
+  },
+  "plugins": [
+    {
+      "name": "agentroots",
+      "source": {
+        "source": "local",
+        "path": "./plugins/agentroots"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

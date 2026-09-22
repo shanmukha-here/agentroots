@@ -4,162 +4,196 @@
 
 ### Different agents. Same roots.
 
-Evidence-governed continuity for agents that explore, build, and research together.
+Shared, evidence-backed project knowledge across agents, sessions, and harnesses.
 
-Built by Shanmukha Vellamcheti and
-<a href="https://openai.com/codex/"><img src="docs/assets/brand/openai-blossom-96.png" alt="OpenAI" width="18"> OpenAI Codex</a>.
+Built by Shanmukha Vellamcheti and Codex, an AI coding collaborator.
 
 <br clear="left">
 
-Agents make exploration dramatically faster, but temporary contexts make useful work disposable.
-Files get reread, failed paths get repeated, facts blur, and every fresh agent must reconstruct the
-project's state. AgentRoots gives agents one durable, reviewed frontier instead.
+Your next agent should inherit the work, not repeat the investigation. AgentRoots keeps what
+you tried, what you know, why it matters, and what remains to do in one durable project graph.
+A fresh agent gets compact, relevant pointers and opens the evidence only when needed.
 
-**Memory preserves experience. AgentRoots governs the frontier.**
+**Past attempts. Present understanding. Future intent. One project's shared roots.**
 
-![AgentRoots connects past attempts, present evidence, and the future frontier through shared roots](docs/assets/agentroots-past-present-future-v2.jpg)
+![AgentRoots connects past attempts, present evidence, and future work through shared roots](docs/assets/agentroots-past-present-future-v2.jpg)
 
-AgentRoots is an open-source Agent Continuity MCP for Codex, Claude, DeepSeek, and generic MCP
-clients. It preserves where a project came from, what is currently supported, and what should
-happen next, without replaying transcripts or duplicating large artifacts.
+AgentRoots is a local-first, open-source MCP server for engineering, research, and long-running
+agent work. A smaller agent can investigate and propose findings; another agent can review and
+reuse them later. Optional, read-only conversation backfill also recovers leads that never made
+it into a handoff or source file. History stays untrusted until conclusions pass review.
 
-One agent can preserve useful state across sessions. Multiple agents can propose, review, and
-reuse the same findings. AgentRoots does not spawn, schedule, route, or execute agents.
+No required model API, cloud account, or agent orchestrator. Works with one agent across sessions
+or several agents sharing a project. It helps reduce repeated exploration, not eliminate every
+file read or replace verification.
 
-## See project state at a glance
+## Start here
 
-![AgentRoots knowledge graph showing connected questions, findings, observations, and evidence-governed lifecycle states](docs/assets/agentroots-knowledge-graph.png)
+Requires Python 3.11+ and Git. Use a Python virtual environment if your OS manages its Python
+installation. Codex proactive hooks also require Node.js.
 
-This synthetic overview exercises all 14 record types and all 12 relationship types in the current
-contract. The human-readable graph is generated from the same versioned event ledger that agents
-query, making the complete project model inspectable without creating a second source of truth.
+```bash
+python -m pip install "agentroots @ git+https://github.com/shanmukha-here/agentroots.git@v0.2.0"
+agentroots setup
+```
+
+Setup detects supported clients, asks before changing their configuration, and separately asks
+whether it may read existing conversations. You can decline history or select particular projects.
+Codex requires an additional `/hooks` review. Downloads and approved backfill continue in the
+background; lexical search works while the semantic model warms up. Setup is short, but installation
+and large history imports depend on your connection and machine.
+
+Then use your agents normally. On supported hook paths, AgentRoots recalls compact project context
+at prompt and tool boundaries and queues new findings for review. It stays quiet when there is
+nothing useful to add. Notification presentation depends on the host; not every client shows toasts.
+
+```bash
+agentroots status          # backends, RAM, storage, and indexing progress
+agentroots doctor          # configuration and integration checks
+agentroots project-current # the project this checkout resolves to
+```
+
+**v0.2.0 is an alpha, not a universal background-memory service.** Codex has a validated MCP and
+proactive hook path. OpenCode automation is experimental. Claude and other stdio MCP clients can
+call tools, but do not get automatic hooks from this package. DeepSeek support depends on its
+harness, not its model name. See the [support matrix](docs/support-matrix.md).
+
+No PyPI publication yet. Existing users: see the [upgrade notes](CHANGELOG.md#upgrading-from-010).
+For manual configuration and history selection, see [integrations](docs/integrations.md).
+
+## See the knowledge, not just the conversation
+
+![Full synthetic AgentRoots knowledge graph with goals, findings, evidence, and lifecycle states](docs/assets/agentroots-knowledge-graph.png)
+
+The same versioned state agents query becomes an offline, interactive knowledge map for humans.
+Search, filter, trace relationships, inspect evidence, and copy record IDs to request corrections.
+The synthetic overview covers all 14 record types and 12 relationship types. It contains no private
+project content. Direct editing in the graph is planned; today corrections use the CLI or MCP.
+
+```bash
+agentroots graph PROJECT_ID /path/outside/repo/project-map.html
+```
 
 ## Why I built AgentRoots
 
-My research requires exploring many hypotheses and experimental paths. Before coding agents, the
-number of experiments I could run manually was naturally limited. Agents changed that. They made
-hypothesis exploration and project-state growth dramatically faster, but they also created a new
-memory-management problem.
+My research involves exploring many hypotheses and experimental paths. Coding agents let me try
+more of them, faster. But as experiments, conversations, and subagents multiplied, keeping track
+of what we had already learned became its own problem.
 
-Modern agentic work increasingly depends on orchestrators and subagents for speed and cost
-efficiency. That can multiply duplicated work. If an orchestrator assigns two independent tasks in
-the same codebase, both subagents may reread the same files to understand the project, after the
-orchestrator already read them to make the plan. The same knowledge may be reconstructed three
-times. Across longer projects, context gets mixed, facts blur, failed paths are repeated, and the
-latest working frontier becomes difficult to recover.
+An orchestrator might read a codebase to plan two tasks, then both subagents read the same files
+to get up to speed. That is the same understanding reconstructed three times. Weeks later, after
+compaction or a switch to another harness, an agent can suggest an experiment we already discussed
+and ruled out. The reason may exist only in an old conversation, not in the code or latest handoff.
 
-Memory tools preserve experience. Planning tools preserve intent. Provenance tools preserve what
-ran and changed. AgentRoots connects those concerns as evidence-governed project state: what is
-the project's origin, what is currently accepted, what evidence supports it, what is stale or
-disputed, which goals remain active, and what questions or experiments should happen next. This
-lets agents across models and harnesses inherit a compact, grounded frontier, then verify only what
-their task requires instead of rebuilding the entire context from scratch.
+I wanted that work to become durable without filling every new prompt with the entire past.
+AgentRoots connects the project's origin and intent, previous attempts, current evidence, and open
+questions. An agent can inherit that understanding, check what matters for its task, and add to it.
+Research motivated it, but the same problem appears in software projects and other long-running work.
 
-I built AgentRoots because I needed agents to share more than memories. I needed them to inhabit
-the same evolving state, avoid duplicated exploration, and continue from the real frontier.
+This is not a claim that other memory tools only remember the past. Memory, planning, and provenance
+systems overlap. AgentRoots focuses on connecting them in a compact, reviewable project graph,
+without owning the agents themselves. See the [landscape and boundaries](docs/landscape.md).
 
-## Why AgentRoots
+## How the roots grow
 
-AI agents are temporary. Their work should not be. AgentRoots preserves goals, questions,
-hypotheses, experiments, observations, findings, decisions, failures, and evidence across
-sessions, models, and harnesses.
+1. **Capture leads.** Agents propose records, or approved conversation history is indexed read-only.
+   Background extraction creates candidates, never accepted facts.
+2. **Ground and review.** Link evidence, inspect contradictions, and accept or reject a proposal.
+   A creator cannot accept its own proposal by default. Changes append revisions and events.
+3. **Recall when relevant.** MCP provides bounded context. Supported hooks also check emerging
+   tool intent and results, not just the initial user prompt. They offer advice, not execution gates.
+4. **Keep state current.** Revalidate Git and tracker evidence, mark changed findings stale, and
+   preserve failed approaches. Accepted results can explicitly resolve goals or questions.
 
-Branches explore. Roots remember.
-
-## Quick start
+The durable boundary is the **project**, not the agent, model, harness, or conversation. Routing
+uses explicit metadata, Git remotes, and registered aliases. Conversation text cannot choose a
+different project. Bind a preferred project name once when needed:
 
 ```bash
-python -m pip install "agentroots @ git+https://github.com/shanmukha-here/agentroots.git"
-agentroots propose demo hypothesis "Caching helps" "Latency should fall." --actor codex
-agentroots-mcp
+agentroots project-bind PROJECT_ID /path/to/repository
 ```
 
-AgentRoots is not published to PyPI yet. Contributors cloning the repository can instead use
-`python -m pip install -e .`. Python 3.11 or newer is required.
+Matching project identities does not automatically synchronize separate machines. Share approved
+state through export/import or backup/restore; hosted team sync is not shipped.
 
-State defaults to the OS or XDG user data directory. Override it with `AGENTROOTS_DB` or
-`--db`. The legacy `RESEARCH_STATE_DB` variable remains accepted for local migration. SQLite
-runs in WAL mode. Generated state stays outside the repository.
+## Small context, inspectable evidence
 
-## MCP surface
-
-Tools: `research_get_context`, `research_get_frontier`, `research_query`,
-`research_get_record`, `research_get_graph`, `research_propose`, `research_revise`, `research_review`,
-`research_link_evidence`, `research_mlflow`, `research_sync`, and `research_validate`.
-
-Resources: project brief, project frontier, record, and context packet under the
-`research://` URI scheme. Protocol names remain research-specific because the initial ontology
-models evidence-backed investigative work. AgentRoots branding covers its broader engineering,
-research, and long-running agent uses.
-
-Exact resource templates:
-
-- `research://project/{project}/brief`
-- `research://project/{project}/frontier`
-- `research://record/{record_id}`
-- `research://packet/{packet_id}`
-
-Example MCP argument shapes:
+The default MCP context response offers up to five matches within a conservative **200 estimated
+token** budget, with short record IDs for opening details. Hook injections are capped at **180
+estimated tokens**. These are payload budgets, not guarantees about a host's wrapper tokens,
+total turn cost, or provider cache hits. Changing hook context is appended at supported event
+boundaries, not rewritten into a stable system-prompt prefix.
 
 ```json
-{"tool":"research_propose","arguments":{"project":"demo","record_type":"finding","title":"Cache result","body":"The cache reduced repeated reads by 12 percent in the measured workflow. The comparison used the same task fixture and code revision. This supports retaining the cache for subsequent trials. A replication should confirm the result on a larger repository.","creator":"codex"}}
-{"tool":"research_review","arguments":{"record_id":"UUID","actor":"reviewer","verdict":"accepted","resolves_record_ids":["GOAL_UUID"]}}
-{"tool":"research_link_evidence","arguments":{"record_id":"UUID","uri":"mlflow://runs/123","kind":"mlflow-run","actor":"reviewer","content_hash":"sha256-if-known"}}
-{"tool":"research_get_context","arguments":{"project":"demo","query":"cache","token_budget":1500}}
-{"tool":"research_mlflow","arguments":{"operation":"link","record_id":"UUID","run_id":"RUN_ID","actor":"reviewer","include_artifacts":true}}
+{"tool":"research_get_context","arguments":{"project":"my-project","query":"previous cache failures"}}
+{"tool":"research_get_record","arguments":{"project":"my-project","record_id":"8f2a91c4"}}
 ```
 
-`research_sync` imports supplied events, exports current project events, and can mark packet
-record IDs as used. CLI `export` and `import` provide file-based JSONL transfer.
+The record ID above is illustrative. Use an ID returned by your context response. Full packets are
+available with `view: "full"`; records are normalized and the serialized response is budgeted.
+MCP reads do not write packet-audit rows. Explicit CLI context packets are audited.
 
-CLI query text is positional. Run `agentroots <command> --help` for command-specific arguments:
+Retrieval and extraction do different jobs:
 
-```bash
-agentroots context demo "cache latency" --tokens 1500
-agentroots validate demo
-agentroots export demo events.jsonl
-agentroots graph demo project-map.html
-```
+- **BGE + FTS5 + fuzzy search** retrieve existing state. BGE is enabled by default and warms in
+  the background. FTS continues serving cold or failed-model requests. Set
+  `AGENTROOTS_SEMANTIC=off` for lexical-only operation.
+- **Candidate extraction** uses configured Qwen first, optional GLiNER next, and a conservative
+  heuristic otherwise. Qwen weights are not bundled, training is not required for normal use,
+  and no extraction backend bypasses review.
 
-The graph command creates a self-contained, read-only React Flow knowledge map. It works offline
-and supports automatic layouts, searching, lifecycle and type filters, pan and zoom, evidence
-inspection, version metadata, relationship tracing, and copying record IDs for review or
-correction. See [graph viewer architecture](docs/graph-viewer.md) for customization and the
-governed editing roadmap.
+See [measured latency, token costs, and limitations](docs/hook-evaluation.md). Development results
+are not evidence of universal productivity gains or reliable recall for every project.
 
-On Windows, prefer these positional CLI commands or MCP tool calls over hand-escaped JSON in
-PowerShell. For contributor tests in a clean checkout:
+## What ships
+
+- External SQLite WAL storage, append-only events, revisions, and project-scoped graph queries.
+- Candidate review, evidence classification, contradictions, failure recall, and stale-state checks.
+- Read-only history backfill for Codex and OpenCode, with separate untrusted episode search.
+- Codex proactive hooks, a resident local daemon, and an experimental OpenCode plugin.
+- Read-only MLflow run search, comparison, snapshots, and revalidation. Trackio has an adapter
+  interface; H-E-F and signac have importers.
+- Interactive read-only graph export, JSONL event transfer, and full-state backup/restore.
+- CLI, 16 MCP tools, resources, schemas, reproducible synthetic workflows, and regression tests.
+
+The `research_*` tool names retain the original investigative ontology. The project boundary is
+broad enough for engineering and general agent work; you do not need to invent a hypothesis or
+pretend an exploratory run was preregistered. See the [protocol](docs/specification.md) and
+[tool configuration](docs/integrations.md).
+
+## Privacy and trust boundaries
+
+State, model weights, and indexes stay in OS user data/cache directories, not your repository.
+Large artifacts stay in their tracker or original storage. Source conversations are read-only;
+backfill requires approval. No telemetry or required cloud inference is built in.
+
+Stored text is untrusted. Secret scanning and redaction reduce exposure but are not a guarantee
+that every secret or prompt injection is detected. Claims, findings, observations, and decisions
+need mechanically verified evidence before acceptance. A checksum verifies the referenced bytes,
+not the scientific truth of a conclusion. Arbitrary URIs and caller-written test receipts are
+references, not automatically verified proof.
+
+Actor names are local provenance labels, not authenticated identities. Self-review rules prevent
+cooperative mistakes, not hostile impersonation. AgentRoots does not expose a production team
+authorization boundary. See [SECURITY.md](SECURITY.md).
+
+AgentRoots never owns agent spawning, model routing, stored-command execution, schedulers,
+training jobs, worktrees, or artifact storage. PostgreSQL, remote HTTP, ACLs, full Flowcept/AiiDA
+integrations, and direct graph editing remain [roadmap work](docs/roadmap.md).
+
+## Contribute or reproduce the workflow
 
 ```bash
 python -m pip install -e ".[dev]"
 python -m pytest
+python -m examples.full_flow_demo --output /path/outside/repo/agentroots-demo
 ```
 
-Lifecycle: candidate to provisional to accepted, plus disputed, rejected, superseded, and stale.
-Creators cannot accept their own proposals by default. Acceptance requires resolvable evidence.
-Mutations emit append-only events. Stored text is always treated as untrusted data.
-Substantive records should normally explain context, evidence, implications, and next steps in
-three to five sentences. `research_validate` warns about thin provisional or accepted records;
-set `metadata.concise_fact=true` only when a shorter statement is genuinely complete.
-An accepted finding can explicitly resolve one or more goals. A `resolves` link removes those
-goals from the active frontier while preserving their full history. `supports` does not close a
-goal.
+The demo exercises approved synthetic history, review, a local MLflow fixture, duplicate-risk
+recall, and Git-induced staleness. It is a reproducible core workflow, not a recording of a live
+agent. The polished live-session video is still pending.
 
-Implemented today:
+[Architecture](docs/architecture.md) · [Evaluation](docs/evaluation.md) ·
+[Changelog](CHANGELOG.md) · [Contributors](CONTRIBUTORS.md)
 
-- SQLite event ledger, revisions, projections, FTS5, and fuzzy lookup
-- sectioned, token-budgeted, audited context packets
-- review governance, contradictions, failed-attempt recall, and Git staleness
-- exact JSONL event sync plus backup and restore
-- read-only MLflow evidence integration and Trackio adapter
-- H-E-F and signac importers
-- stdio MCP server, CLI, schemas, tests, fixtures, and three-agent demo
-
-Flowcept, AiiDA, PostgreSQL, remote HTTP, ACLs, and UI remain roadmap work. See the
-[specification](docs/specification.md), [architecture](docs/architecture.md),
-[integrations](docs/integrations.md), [roadmap](docs/roadmap.md),
-[evaluation](docs/evaluation.md), and [demo](examples/three_agent_demo.py).
-
-## Contributors
-
-See [CONTRIBUTORS.md](CONTRIBUTORS.md). Contributions are welcome under Apache-2.0.
+Apache-2.0. Contributions and reports from real projects are welcome.

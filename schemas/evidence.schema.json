@@ -1,1 +1,42 @@
-{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","required":["record_id","uri","kind"],"properties":{"record_id":{"type":"string","format":"uuid"},"uri":{"type":"string"},"kind":{"enum":["git-commit","git-blob","git-file","git-symbol","test","tracker-run","artifact","paper","human","external-provenance"]},"summary":{"type":"string"},"content_hash":{"type":["string","null"]},"metadata":{"type":"object"}},"additionalProperties":false}
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AgentRoots evidence link",
+  "type": "object",
+  "required": ["record_id", "uri", "kind"],
+  "properties": {
+    "id": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Optional local projection identifier. It is not part of evidence identity."
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Optional local evidence projection revision for optimistic concurrency."
+    },
+    "record_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "uri": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Resolvable or reference-only evidence location."
+    },
+    "kind": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Open evidence kind. Known adapters add verification semantics without closing the protocol to new kinds."
+    },
+    "summary": {
+      "type": "string"
+    },
+    "content_hash": {
+      "type": ["string", "null"]
+    },
+    "metadata": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}

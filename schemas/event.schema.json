@@ -1,1 +1,64 @@
-{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","required":["event_id","project","record_id","revision","event_type","actor","at","payload"],"properties":{"event_id":{"type":"string","format":"uuid"},"project":{"type":"string"},"record_id":{"type":"string","format":"uuid"},"revision":{"type":"integer"},"event_type":{"type":"string"},"actor":{"type":"string"},"at":{"type":"string","format":"date-time"},"payload":{"type":"object"},"idempotency_key":{"type":["string","null"]}},"additionalProperties":false}
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AgentRoots ledger event",
+  "type": "object",
+  "required": [
+    "event_id",
+    "project",
+    "record_id",
+    "revision",
+    "event_type",
+    "actor",
+    "at",
+    "payload"
+  ],
+  "properties": {
+    "seq": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Optional destination-local ledger order included by exports."
+    },
+    "event_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "project": {
+      "type": "string",
+      "minLength": 1
+    },
+    "record_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "event_type": {
+      "enum": [
+        "proposed",
+        "revised",
+        "reviewed",
+        "evidence_linked",
+        "evidence_revised",
+        "evidence_revalidated",
+        "linked"
+      ]
+    },
+    "actor": {
+      "type": "string",
+      "minLength": 1
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "payload": {
+      "type": "object"
+    },
+    "idempotency_key": {
+      "type": ["string", "null"]
+    }
+  },
+  "additionalProperties": false
+}

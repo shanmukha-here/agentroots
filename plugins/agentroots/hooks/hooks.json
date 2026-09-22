@@ -1,0 +1,113 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${PLUGIN_ROOT}/scripts/hook.mjs\" SessionStart",
+            "commandWindows": "node \"${PLUGIN_ROOT}/scripts/hook.mjs\" SessionStart",
+            "timeout": 5,
+            "statusMessage": "AgentRoots session context",
+            "additionalContextLimit": 220
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${PLUGIN_ROOT}/scripts/hook.mjs\" SubagentStart",
+            "commandWindows": "node \"${PLUGIN_ROOT}/scripts/hook.mjs\" SubagentStart",
+            "timeout": 5,
+            "statusMessage": "AgentRoots subagent context",
+            "additionalContextLimit": 220
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${PLUGIN_ROOT}/scripts/hook.mjs\" UserPromptSubmit",
+            "commandWindows": "node \"${PLUGIN_ROOT}/scripts/hook.mjs\" UserPromptSubmit",
+            "timeout": 5,
+            "statusMessage": "AgentRoots intent context",
+            "additionalContextLimit": 220
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${PLUGIN_ROOT}/scripts/hook.mjs\" PreToolUse",
+            "commandWindows": "node \"${PLUGIN_ROOT}/scripts/hook.mjs\" PreToolUse",
+            "timeout": 5,
+            "statusMessage": "AgentRoots pre-action check",
+            "additionalContextLimit": 220
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${PLUGIN_ROOT}/scripts/hook.mjs\" PostToolUse",
+            "commandWindows": "node \"${PLUGIN_ROOT}/scripts/hook.mjs\" PostToolUse",
+            "timeout": 5,
+            "statusMessage": "AgentRoots tool context",
+            "additionalContextLimit": 220
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${PLUGIN_ROOT}/scripts/hook.mjs\" PostCompact",
+            "commandWindows": "node \"${PLUGIN_ROOT}/scripts/hook.mjs\" PostCompact",
+            "timeout": 5,
+            "statusMessage": "AgentRoots compaction checkpoint"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${PLUGIN_ROOT}/scripts/hook.mjs\" SubagentStop",
+            "commandWindows": "node \"${PLUGIN_ROOT}/scripts/hook.mjs\" SubagentStop",
+            "timeout": 8,
+            "statusMessage": "AgentRoots subagent candidates"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${PLUGIN_ROOT}/scripts/hook.mjs\" Stop",
+            "commandWindows": "node \"${PLUGIN_ROOT}/scripts/hook.mjs\" Stop",
+            "timeout": 8,
+            "statusMessage": "AgentRoots candidate extraction"
+          }
+        ]
+      }
+    ]
+  }
+}

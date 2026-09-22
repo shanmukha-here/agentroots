@@ -1,10 +1,31 @@
 from __future__ import annotations
 
+import json
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 from uuid import uuid4
+
+MAX_RECORD_TITLE_CHARS = 240
+MAX_RECORD_BODY_CHARS = 8_000
+MAX_RECORD_METADATA_BYTES = 16_384
+
+
+def validate_record_content(title: str, body: str, metadata: dict[str, Any]) -> None:
+    """Enforce the compact governed-record contract at every write boundary."""
+    if len(title) > MAX_RECORD_TITLE_CHARS:
+        raise ValueError(f"title exceeds {MAX_RECORD_TITLE_CHARS} characters")
+    if len(body) > MAX_RECORD_BODY_CHARS:
+        raise ValueError(f"body exceeds {MAX_RECORD_BODY_CHARS} characters")
+    try:
+        metadata_bytes = len(
+            json.dumps(metadata, sort_keys=True, ensure_ascii=False).encode("utf-8")
+        )
+    except (TypeError, ValueError) as exc:
+        raise ValueError("metadata must be JSON serializable") from exc
+    if metadata_bytes > MAX_RECORD_METADATA_BYTES:
+        raise ValueError(f"metadata exceeds {MAX_RECORD_METADATA_BYTES} UTF-8 bytes")
 
 
 class RecordType(StrEnum):

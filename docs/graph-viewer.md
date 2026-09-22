@@ -9,7 +9,8 @@ bundle their runtime, styles, and graph JSON into one offline HTML file.
 - custom nodes for every AgentRoots record type
 - lifecycle-driven styling
 - complete text in a details panel
-- evidence and relationship inspection
+- evidence-reference and relationship inspection, with core or adapter verification status when
+  available
 - search and type or lifecycle filtering
 - automatic fit, pan, zoom, minimap, and layout switching
 - selection focus that dims unrelated branches
@@ -40,18 +41,20 @@ in the browser. The intended command boundary is:
 
 1. Human edits a draft node or relationship.
 2. Viewer submits the command with project ID, actor, record ID, and expected revision.
-3. AgentRoots validates lifecycle, permissions, evidence rules, and optimistic concurrency.
+3. AgentRoots validates lifecycle, evidence-reference rules, project boundaries, and optimistic
+   concurrency. Typed adapters may verify supported evidence kinds separately. In the local alpha, the
+   actor value is a provenance label, not an authenticated principal.
 4. AgentRoots appends an event and updates the current projection.
 5. The viewer receives the new graph version.
 6. Connected agents receive only an affected-record notification and refresh context when needed.
 
-Candidate commands include `propose_revision`, `change_status`, `add_relationship`,
-`remove_relationship`, `link_evidence`, and `resolve_contradiction`. The backend remains the sole
-authority for every mutation.
+Candidate commands include `change_status`, `remove_relationship`, and `resolve_contradiction`.
+The backend already exposes `research_revise`, `research_link_records`, `research_link_evidence`,
+and `research_candidate` for governed revisions, same-project edges, evidence, and extracted-candidate
+review. The viewer does not call them yet. The backend remains the sole authority for every mutation.
 
-`research_revise` now provides the first persistence primitive for that editor. It uses expected
-revisions and append-only events. Revising accepted knowledge returns it to provisional status so
-the changed meaning must be reviewed again.
+`research_revise` uses expected revisions and append-only events. Revising accepted knowledge
+returns it to provisional status so the changed meaning must be reviewed again.
 
 For larger graphs, clustering and server-side graph scopes can be added without changing the
 record or link contract. A separate WebGL overview may be introduced only if real projects exceed

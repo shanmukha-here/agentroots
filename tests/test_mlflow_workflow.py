@@ -215,6 +215,7 @@ def test_mcp_mlflow_surface_get_compare_link_and_validate(
         record_id=finding["id"],
         experiment_record_id=experiment["id"],
         actor="worker",
+        project="p",
     )
     assert linked["record"]["evidence"][0]["metadata"]["adapter"] == "mlflow"
     assert linked["run_ref"]["type"] == "run_ref"
@@ -224,10 +225,10 @@ def test_mcp_mlflow_surface_get_compare_link_and_validate(
     )
     event_count = len(service.sync_export("p"))
     repeated = agentroots_server.research_mlflow(
-        "link", run_id="r", record_id=finding["id"], actor="worker"
+        "link", run_id="r", record_id=finding["id"], actor="worker", project="p"
     )
     assert repeated["run_ref"]["id"] == linked["run_ref"]["id"]
     assert len(service.sync_export("p")) == event_count
     assert agentroots_server.research_mlflow(
-        "validate", run_id="r", record_id=finding["id"]
+        "validate", run_id="r", record_id=finding["id"], project="p"
     )["matched"]
